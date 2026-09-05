@@ -45,7 +45,7 @@
                         <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Pengukuran Waterpass (Pergi & Pulang)</h4>
                         <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContohKKV()">Muat Data Contoh</button>
                     </div>
-                    <p class="small text-muted mb-3">Masukkan nama titik, beda tinggi pergi ($\Delta h$ Pergi), beda tinggi pulang ($\Delta h$ Pulang), dan jarak antar titik.</p>
+                    <p class="small text-muted mb-3">Masukkan nama titik, beda tinggi pergi (Δh Pergi), beda tinggi pulang (Δh Pulang), dan jarak antar titik.</p>
 
                     <form id="kkvForm">
                         <div class="table-responsive mb-3" style="max-height: 350px; overflow-y: auto;">
@@ -53,8 +53,8 @@
                                 <thead class="table-light sticky-top">
                                     <tr>
                                         <th>Titik</th>
-                                        <th>$\Delta h$ Pergi (mm)</th>
-                                        <th>$\Delta h$ Pulang (mm)</th>
+                                        <th>Δh Pergi (mm)</th>
+                                        <th>Δh Pulang (mm)</th>
                                         <th>Jarak (m)</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -72,8 +72,8 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="elevasiAwal" class="form-label fw-semibold">Elevasi Awal / BM Awal ($H_0$ dalam meter):</label>
-                                <input type="number" step="any" class="form-control" id="elevasiAwal" value="0">
+                                <label for="elevasiAwal" class="form-label fw-semibold">Elevasi Awal / BM Awal (H₀ dalam meter):</label>
+                                <input type="number" step="any" class="form-control" id="elevasiAwal" value="">
                             </div>
                         </div>
 
@@ -100,12 +100,12 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>Titik</th>
-                                    <th>$\Delta h$ Pergi (mm)</th>
-                                    <th>$\Delta h$ Pulang (mm)</th>
-                                    <th>$\Delta h$ Rata-rata (mm)</th>
+                                    <th>Δh Pergi (mm)</th>
+                                    <th>Δh Pulang (mm)</th>
+                                    <th>Δh Rata-rata (mm)</th>
                                     <th>Jarak (m)</th>
                                     <th>Koreksi (m)</th>
-                                    <th>Elevasi Akhir $H$ (m)</th>
+                                    <th>Elevasi Akhir H (m)</th>
                                 </tr>
                             </thead>
                             <tbody id="hasilBodyKKV">
@@ -243,12 +243,10 @@
                 return;
             }
 
-            let worksheet = XLSX.utils.json_to_sheet(globalHasilData); // wait, let fix variable name here to globalHasilKKV
-            // Let's use globalHasilKKV correctly:
-            // let worksheet = XLSX.utils.json_to_sheet(globalHasilKKV);
-            // let workbook = XLSX.utils.book_new();
-            // XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKV Waterpass");
-            // XLSX.writeFile(workbook, "Laporan_KKV_Waterpass.xlsx");
+            let worksheet = XLSX.utils.json_to_sheet(globalHasilKKV);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKV Waterpass");
+            XLSX.writeFile(workbook, "Laporan_KKV_Waterpass.xlsx");
         }
     </script>
 </body>
