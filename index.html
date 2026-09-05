@@ -3,38 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRISTRIS - Hitung KKH & Poligon</title>
+    <title>Web GIS Ukur Tanah - KKH & Poligon</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        #map { height: 500px; width: 100%; border-radius: 8px; }
-        .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s ease; }
+        #map { height: 480px; width: 100%; border-radius: 8px; z-index: 1; }
+        .table-hover tbody tr:hover { background-color: rgba(13, 110, 253, 0.04); }
+        .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); border-color: #86b7fe; }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <div class="container my-5">
+    <div class="container py-5">
         <!-- Header -->
         <div class="text-center mb-5">
-            <h1 class="fw-bold text-primary">Web GIS Pembelajaran Ukur Tanah</h1>
-            <p class="text-muted">Kalkulator Otomatis Kerangka Kontrol Horizontal (KKH) & Visualisasi Poligon</p>
+            <h2 class="fw-bold text-primary">Web GIS Pembelajaran Ukur Tanah</h2>
+            <p class="text-muted">Kalkulator Otomatis Kerangka Kontrol Horizontal (KKH) & Visualisasi Poligon Interaktif</p>
         </div>
 
         <div class="row g-4">
-            <!-- Kolom Kiri: Input Data & Tombol -->
+            <!-- Kolom Kiri: Input Data -->
             <div class="col-lg-6">
-                <div class="card p-4">
-                    <h4 class="mb-3">Data Lapangan Poligon</h4>
-                    <p class="small text-muted">Masukkan nama titik, sudut terukur (dalam derajat desimal), dan jarak (meter).</p>
-                    
-                    <button class="btn btn-outline-secondary btn-sm mb-3" onclick="muatDataContoh()">Muat Data Contoh (Dummy)</button>
+                <div class="card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon</h4>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContoh()">Muat Data Contoh</button>
+                    </div>
+                    <p class="small text-muted mb-3">Masukkan nama titik, sudut terukur (dalam format desimal derajat), dan jarak (meter).</p>
 
                     <form id="kkhForm">
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle" id="inputTable">
-                                <thead class="table-light">
+                        <div class="table-responsive mb-3" style="max-height: 280px; overflow-y: auto;">
+                            <table class="table table-sm table-bordered align-middle text-center" id="inputTable">
+                                <thead class="table-light sticky-top">
                                     <tr>
                                         <th>Titik</th>
                                         <th>Sudut Terukur (°)</th>
@@ -43,18 +49,24 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody">
-                                    <!-- Baris dinamis akan masuk ke sini -->
+                                    <!-- Baris dinamis -->
                                 </tbody>
                             </table>
                         </div>
-                        <button type="button" class="btn btn-success btn-sm mb-3" onclick="tambahBaris()">+ Tambah Titik</button>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <button type="button" class="btn btn-success btn-sm px-3" onclick="tambahBaris()">+ Tambah Titik</button>
+                            <span class="text-muted small" id="totalTitikInfo">Total Titik: 0</span>
+                        </div>
                         
                         <div class="mb-3">
-                            <label for="azimuthAwal" class="form-label fw-bold">Azimuth Awal ($\alpha_1$) dalam Derajat:</label>
+                            <label for="azimuthAwal" class="form-label fw-semibold">Azimuth Awal (α₁) dalam Derajat:</label>
                             <input type="number" step="any" class="form-control" id="azimuthAwal" value="201.702778" required>
                         </div>
 
-                        <button type="button" class="btn btn-primary w-100" onclick="prosesHitungan()">Hitung KKH & Gambar Peta</button>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung KKH & Perbarui Peta</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -62,35 +74,42 @@
             <!-- Kolom Kanan: Peta Web GIS -->
             <div class="col-lg-6">
                 <div class="card p-4 h-100">
-                    <h4 class="mb-3">Visualisasi Peta Poligon</h4>
+                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Peta Poligon</h4>
                     <div id="map"></div>
                 </div>
             </div>
         </div>
 
         <!-- Tabel Hasil Perhitungan -->
-        <div class="row mt-5">
+        <div class="row mt-4">
             <div class="col-12">
                 <div class="card p-4">
-                    <h4 class="mb-3">Hasil Hitungan & Koreksi KKH</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Hitungan & Koreksi KKH</h4>
+                        <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadExcel()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill me-1" viewBox="0 0 16 16">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z"/>
+                            </svg>
+                            Download Excel (.xlsx)
+                        </button>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered text-center align-middle" id="hasilTable">
-                            <table class="table table-striped table-bordered text-center align-middle" id="hasilTable">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Titik</th>
-                                        <th>Sudut Terkoreksi (°)</th>
-                                        <th>Azimuth (°)</th>
-                                        <th>$\Delta X$ (m)</th>
-                                        <th>$\Delta Y$ (m)</th>
-                                        <th>Easting ($X$)</th>
-                                        <th>Northing ($Y$)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="hasilBody">
-                                    <tr><td colspan="7" class="text-muted">Belum ada data dihitung.</td></tr>
-                                </tbody>
-                            </table>
+                        <table class="table table-hover table-bordered text-center align-middle" id="hasilTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Titik</th>
+                                    <th>Sudut Terkoreksi (°)</th>
+                                    <th>Azimuth (°)</th>
+                                    <th>ΔX (m)</th>
+                                    <th>ΔY (m)</th>
+                                    <th>Easting (X)</th>
+                                    <th>Northing (Y)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hasilBody">
+                                <tr><td colspan="7" class="text-muted py-3">Belum ada data dihitung. Silakan masukkan data di atas.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -108,21 +127,28 @@
 
         let polylineLayer = null;
         let markersLayer = L.layerGroup().addTo(map);
+        let globalHasilData = []; // Menyimpan data hasil untuk export excel
 
         // Fungsi Tambah Baris Form Input
         function tambahBaris(titik = '', sudut = '', jarak = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm sudut-input" value="${sudut}" placeholder="72.59"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="71.49"></td>
-                <td class="text-center"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
+                <td><input type="text" class="form-control form-control-sm text-center titik-input" value="${titik}" placeholder="P1"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm text-center sudut-input" value="${sudut}" placeholder="72.59"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm text-center jarak-input" value="${jarak}" placeholder="71.49"></td>
+                <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfo();">×</button></td>
             `;
             tbody.appendChild(row);
+            updateInfo();
         }
 
-        // Muat Data Contoh (Berdasarkan file Excel)
+        function updateInfo() {
+            let rows = document.querySelectorAll('#tableBody tr');
+            document.getElementById('totalTitikInfo').innerText = `Total Titik: ${rows.length}`;
+        }
+
+        // Muat Data Contoh Standar
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
             tambahBaris('P1', 72.594097, 71.490041);
@@ -130,12 +156,12 @@
             tambahBaris('P3', 87.863194, 67.196393);
             tambahBaris('P4', 95.521528, 36.893387);
             document.getElementById('azimuthAwal').value = 201.702778;
+            prosesHitungan();
         }
 
-        // Jalankan saat pertama kali buka
+        // Jalankan saat pertama kali halaman dimuat
         window.onload = function() {
             muatDataContoh();
-            prosesHitungan();
         };
 
         // Fungsi Utama Hitung KKH & Update Peta
@@ -144,7 +170,7 @@
             let data = [];
             
             rows.forEach(row => {
-                let titik = row.querySelector('.titik-input').value;
+                let titik = row.querySelector('.titik-input').value.trim();
                 let sudutTerukur = parseFloat(row.querySelector('.sudut-input').value);
                 let jarak = parseFloat(row.querySelector('.jarak-input').value);
                 if(titik && !isNaN(sudutTerukur) && !isNaN(jarak)) {
@@ -153,7 +179,7 @@
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan data minimal 1 titik!");
+                alert("Harap masukkan data minimal 1 titik yang valid!");
                 return;
             }
 
@@ -170,8 +196,8 @@
 
             let hasilHTML = '';
             let latLngPoints = [];
-            
-            // Titik awal (0,0 lokal)
+            globalHasilData = []; // Reset data export
+
             latLngPoints.push([currentY, currentX]);
 
             data.forEach((item, index) => {
@@ -192,9 +218,20 @@
 
                 latLngPoints.push([currentY, currentX]);
 
+                // Simpan untuk tabel dan excel
+                globalHasilData.push({
+                    "Titik": item.titik,
+                    "Sudut Terkoreksi (°)": Number(sudutTerkoreksi.toFixed(4)),
+                    "Azimuth (°)": Number(currentAzimuth.toFixed(4)),
+                    "ΔX (m)": Number(dX.toFixed(4)),
+                    "ΔY (m)": Number(dY.toFixed(4)),
+                    "Easting X (m)": Number(currentX.toFixed(4)),
+                    "Northing Y (m)": Number(currentY.toFixed(4))
+                });
+
                 hasilHTML += `
                     <tr>
-                        <td><b>${item.titik}</b></td>
+                        <td class="fw-bold">${item.titik}</td>
                         <td>${sudutTerkoreksi.toFixed(4)}°</td>
                         <td>${currentAzimuth.toFixed(4)}°</td>
                         <td>${dX.toFixed(4)}</td>
@@ -211,25 +248,41 @@
             markersLayer.clearLayers();
             if (polylineLayer) map.removeLayer(polylineLayer);
 
-            // Karena koordinat lokal meter bisa langsung digambar, kita buat skala konversi kecil agar pas di peta Leaflet (lat/lng)
-            // Atau kita plot langsung koordinat meter relatif terhadap titik tengah peta
             let baseLat = -5.3971;
             let baseLng = 105.2668;
-            let scale = 0.00001; // faktor konversi meter ke derajat lintasan tipis
+            let scale = 0.00001; 
 
             let mapPoints = latLngPoints.map(pt => [baseLat + (pt[1] * scale), baseLng + (pt[0] * scale)]);
 
-            polylineLayer = L.polyline(mapPoints, {color: 'red', weight: 4}).addTo(map);
+            polylineLayer = L.polyline(mapPoints, {color: '#0d6efd', weight: 4, opacity: 0.8}).addTo(map);
 
             mapPoints.forEach((pt, idx) => {
                 if(idx < data.length) {
-                    L.circleMarker(pt, {radius: 6, color: 'blue', fillColor: '#007bff', fillOpacity: 1})
+                    L.circleMarker(pt, {radius: 7, color: '#fff', weight: 2, fillColor: '#dc3545', fillOpacity: 1})
                       .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m`)
                       .addTo(markersLayer);
                 }
             });
 
-            map.fitBounds(polylineLayer.getBounds());
+            if (mapPoints.length > 0) {
+                map.fitBounds(polylineLayer.getBounds(), { padding: [50, 50] });
+            }
+        }
+
+        // Fungsi Download ke Format Excel (.xlsx)
+        function downloadExcel() {
+            if (globalHasilData.length === 0) {
+                alert("Belum ada data hasil hitungan untuk diunduh!");
+                return;
+            }
+
+            // Buat worksheet dari data JSON
+            let worksheet = XLSX.utils.json_to_sheet(globalHasilData);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKH");
+
+            // Unduh file dengan nama KKH_Hasil_Hitungan.xlsx
+            XLSX.writeFile(workbook, "KKH_Hasil_Hitungan.xlsx");
         }
     </script>
 </body>
