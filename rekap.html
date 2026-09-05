@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web GIS Ukur Tanah - Audit & Deteksi Anomali</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .table-hover tbody tr:hover { background-color: rgba(220, 53, 69, 0.03); }
+        .form-control-sm { text-align: center; }
+        .nav-pills .nav-link.active { background-color: #dc3545; }
+        .badge-anomali { font-size: 0.85rem; padding: 6px 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        <!-- Tombol Navigasi Antar Halaman -->
+        <div class="d-flex justify-content-center mb-4" style="position: relative; z-index: 1050;">
+            <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./index.html">Hitungan KKH & Grafik 3D</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./waterpass.html">Hitungan KKV (Waterpass)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./rekap.html">Audit & Deteksi Anomali</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-danger">Dashboard Audit & Deteksi Anomali Data</h2>
+            <p class="text-muted">Pemeriksaan otomatis kualitas pengukuran KKH & KKV untuk mendeteksi anomali dan data yang tidak masuk akal</p>
+        </div>
+
+        <!-- Panel Kontrol & Input Data Gabungan -->
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-10">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Masukkan Data Gabungan Pengukuran</h4>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="muatDataSimulasiAnomali()">Muat Data Simulasi (Ada Error)</button>
+                    </div>
+                    <p class="small text-muted mb-3">Sistem akan menganalisis selisih pergi-pulang waterpass dan kelurusan sudut poligon secara otomatis.</p>
+
+                    <div class="table-responsive mb-3" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-sm table-bordered align-middle text-center" id="inputTableAudit">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Titik</th>
+                                    <th>Sudut Terukur (Deg Min Sec)</th>
+                                    <th>Jarak (m)</th>
+                                    <th>Δh Pergi (mm)</th>
+                                    <th>Δh Pulang (mm)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBodyAudit">
+                                <!-- Baris dinamis -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <button type="button" class="btn btn-danger btn-sm px-3" onclick="tambahBarisAudit()">+ Tambah Titik</button>
+                        <span class="text-muted small" id="totalTitikInfoAudit">Total Titik: 0</span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-danger py-2 fw-semibold shadow-sm" onclick="jalankanAuditAnomali()">Jalankan Pemeriksaan Anomali & Kualitas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hasil Audit & Log Peringatan Anomali -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Laporan Hasil Audit & Peringatan Kesalahan</h4>
+                        <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadLaporanAudit()">
+                            Download Laporan Audit (.xlsx)
+                        </button>
+                    </div>
+
+                    <!-- Kotak Ringkasan Status -->
+                    <div class="alert alert-secondary mb-4" id="auditAlertBox" role="alert">
+                        Belum ada audit yang dijalankan. Silakan masukkan data dan klik tombol pemeriksaan di atas.
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered text-center align-middle small" id="hasilTableAudit">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Titik</th>
+                                    <th>Miskalkulasi Sudut / Toleransi</th>
+                                    <th>Selisih Pergi-Pulang (Δh)</th>
+                                    <th>Status Anomali / Error</th>
+                                    <th>Saran Tindakan Perbaikan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hasilBodyAudit">
+                                <tr><td colspan="5" class="text-muted py-3">Belum ada data yang diaudit.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalHasilAudit = [];
+
+        function dmsToDec(deg, min, sec) {
+            return parseFloat(deg || 0) + (parseFloat(min || 0) / 60) + (parseFloat(sec || 0) / 3600);
+        }
+
+        function tambahBarisAudit(titik = '', deg = '', min = '', sec = '', jarak = '', pergi = '', pulang = '') {
+            let tbody = document.getElementById('tableBodyAudit');
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="number" class="form-control deg-input" value="${deg}" placeholder="°">
+                        <input type="number" class="form-control min-input" value="${min}" placeholder="′">
+                        <input type="number" step="any" class="form-control sec-input" value="${sec}" placeholder="″">
+                    </div>
+                </td>
+                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="0.00"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm pergi-input" value="${pergi}" placeholder="0"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm pulang-input" value="${pulang}" placeholder="0"></td>
+                <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfoAudit();">×</button></td>
+            `;
+            tbody.appendChild(row);
+            updateInfoAudit();
+        }
+
+        function updateInfoAudit() {
+            let rows = document.querySelectorAll('#tableBodyAudit tr');
+            document.getElementById('totalTitikInfoAudit').innerText = `Total Titik: ${rows.length}`;
+        }
+
+        function muatDataSimulasiAnomali() {
+            document.getElementById('tableBodyAudit').innerHTML = '';
+            tambahBarisAudit('P1', 72, 35, 38, 71.49, -706, 58);
+            tambahBarisAudit('P2', 104, 0, 58, 21.99, -117, 782);
+            tambahBarisAudit('P3', 87, 51, 47, 67.19, -4500, 1200); // Anomali ekstrem
+            tambahBarisAudit('P4', 95, 31, 17, 36.89, -117, 58);
+            jalankanAuditAnomali();
+        }
+
+        window.onload = function() {
+            document.getElementById('tableBodyAudit').innerHTML = '';
+            tambahBarisAudit('', '', '', '', '', '', '');
+            tambahBarisAudit('', '', '', '', '', '', '');
+            tambahBarisAudit('', '', '', '', '', '', '');
+        };
+
+        function jalankanAuditAnomali() {
+            let rows = document.querySelectorAll('#tableBodyAudit tr');
+            let data = [];
+
+            rows.forEach(row => {
+                let titik = row.querySelector('.titik-input').value.trim();
+                let deg = row.querySelector('.deg-input').value;
+                let min = row.querySelector('.min-input').value;
+                let sec = row.querySelector('.sec-input').value;
+                let jarak = parseFloat(row.querySelector('.jarak-input').value);
+                let pergi = parseFloat(row.querySelector('.pergi-input').value);
+                let pulang = parseFloat(row.querySelector('.pulang-input').value);
+
+                let sudutDec = dmsToDec(deg, min, sec);
+                if (titik && !isNaN(sudutDec) && !isNaN(jarak)) {
+                    data.push({ titik, sudutDec, jarak, pergi: isNaN(pergi) ? 0 : pergi, pulang: isNaN(pulang) ? 0 : pulang });
+                }
+            });
+
+            if (data.length === 0) {
+                alert("Harap masukkan minimal 1 baris data yang valid untuk diaudit!");
+                return;
+            }
+
+            let n = data.length;
+            let totalSudutDec = data.reduce((sum, item) => sum + item.sudutDec, 0);
+            let syaratSudutDec = (n - 2) * 180;
+            let errorSudutSec = Math.abs(totalSudutDec - syaratSudutDec) * 3600;
+
+            let hasilHTML = '';
+            globalHasilAudit = [];
+            let totalAnomaliDitemukan = 0;
+
+            data.forEach((item) => {
+                let statusAnomali = "Normal (Aman)";
+                let badgeClass = "bg-success";
+                let saran = "Data konsisten dan memenuhi standar toleransi.";
+
+                if (Math.abs(item.pergi) > 3000 || Math.abs(item.pulang) > 3000 || Math.abs(item.pergi - (-item.pulang)) > 1500) {
+                    statusAnomali = "Anomali Berat (Error Pembacaan Rambu / Salah Catat)";
+                    badgeClass = "bg-danger";
+                    saran = "Lakukan pengecekan ulang lapangan atau ukur kembali slag pada titik ini.";
+                    totalAnomaliDitemukan++;
+                } else if (item.jarak <= 0) {
+                    statusAnomali = "Error Jarak Kosong / Negatif";
+                    badgeClass = "bg-warning text-dark";
+                    saran = "Periksa kembali input jarak meter.";
+                    totalAnomaliDitemukan++;
+                }
+
+                globalHasilAudit.push({
+                    "Titik": item.titik,
+                    "Kesalahan Sudut Total (detik)": Number(errorSudutSec.toFixed(2)),
+                    "Δh Pergi (mm)": item.pergi,
+                    "Δh Pulang (mm)": item.pulang,
+                    "Status Anomali": statusAnomali,
+                    "Saran Perbaikan": saran
+                });
+
+                hasilHTML += `
+                    <tr>
+                        <td class="fw-bold">${item.titik}</td>
+                        <td>${errorSudutSec.toFixed(1)}″</td>
+                        <td>Pergi: ${item.pergi} | Pulang: ${item.pulang}</td>
+                        <td><span class="badge ${badgeClass} badge-anomali">${statusAnomali}</span></td>
+                        <td class="text-start small">${saran}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('hasilBodyAudit').innerHTML = hasilHTML;
+
+            let alertBox = document.getElementById('auditAlertBox');
+            if (totalAnomaliDitemukan > 0) {
+                alertBox.className = "alert alert-danger mb-4";
+                alertBox.innerHTML = `<b>Peringatan Audit:</b> Ditemukan <b>${totalAnomaliDitemukan} titik anomali/error</b> pada data pengukuran Anda. Harap periksa baris yang ditandai merah.`;
+            } else {
+                alertBox.className = "alert alert-success mb-4";
+                alertBox.innerHTML = `<b>Audit Berhasil:</b> Seluruh data pengukuran dinyatakan valid, konsisten, dan tidak ditemukan anomali ekstrem.`;
+            }
+        }
+
+        function downloadLaporanAudit() {
+            if (globalHasilAudit.length === 0) {
+                alert("Belum ada data audit yang diproses!");
+                return;
+            }
+
+            let worksheet = XLSX.utils.json_to_sheet(globalHasilAudit);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Audit Anomali");
+            XLSX.writeFile(workbook, "Laporan_Audit_Ukur_Tanah.xlsx");
+        }
+    </script>
+</body>
+</html>
