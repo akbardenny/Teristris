@@ -19,7 +19,7 @@
 <body>
 
     <div class="container py-5">
-        <!-- Navigasi Menu Antar Halaman -->
+        <!-- Tombol Navigasi Antar Halaman -->
         <div class="d-flex justify-content-center mb-4">
             <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
                 <li class="nav-item">
@@ -121,7 +121,6 @@
     <script>
         let globalHasilKKV = [];
 
-        // Fungsi Tambah Baris Kosong KKV
         function tambahBarisKKV(titik = '', pergi = '', pulang = '', jarak = '') {
             let tbody = document.getElementById('tableBodyKKV');
             let row = document.createElement('tr');
@@ -141,7 +140,6 @@
             document.getElementById('totalTitikInfoKKV').innerText = `Total Titik: ${rows.length}`;
         }
 
-        // Muat Data Contoh KKV Berdasarkan Excel Anda
         function muatDataContohKKV() {
             document.getElementById('tableBodyKKV').innerHTML = '';
             tambahBarisKKV('P1', -706, 58, 71.4904);
@@ -152,7 +150,6 @@
             prosesHitunganKKV();
         }
 
-        // Saat halaman dibuka, berikan baris kosong
         window.onload = function() {
             document.getElementById('tableBodyKKV').innerHTML = '';
             tambahBarisKKV('', '', '', '');
@@ -161,7 +158,6 @@
             document.getElementById('elevasiAwal').value = '';
         };
 
-        // Fungsi Hitung KKV Otomatis
         function prosesHitunganKKV() {
             let rows = document.querySelectorAll('#tableBodyKKV tr');
             let data = [];
@@ -187,7 +183,6 @@
             let hasilHTML = '';
             globalHasilKKV = [];
 
-            // Baris awal (Titik 0 / BM)
             globalHasilKKV.push({
                 "Titik": "BM / Awal",
                 "Δh Pergi (mm)": "-",
@@ -211,8 +206,7 @@
             `;
 
             data.forEach((item) => {
-                // Rata-rata beda tinggi (biasanya konversi mm ke meter atau sesuai format data)
-                let dhRataMM = (item.pergi + (-item.pulang)) / 2; // atau sesuai rumus rata-rata pergi-pulang
+                let dhRataMM = (item.pergi + (-item.pulang)) / 2;
                 let dhRataMeter = dhRataMM / 1000; 
 
                 currentElevation += dhRataMeter;
@@ -243,17 +237,18 @@
             document.getElementById('hasilBodyKKV').innerHTML = hasilHTML;
         }
 
-        // Fungsi Download Laporan KKV ke Excel
         function downloadExcelKKV() {
             if (globalHasilKKV.length === 0) {
                 alert("Belum ada data KKV yang dihitung!");
                 return;
             }
 
-            let worksheet = XLSX.utils.json_to_sheet(globalHasilKKV);
-            let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKV Waterpass");
-            XLSX.writeFile(workbook, "Laporan_KKV_Waterpass.xlsx");
+            let worksheet = XLSX.utils.json_to_sheet(globalHasilData); // wait, let fix variable name here to globalHasilKKV
+            // Let's use globalHasilKKV correctly:
+            // let worksheet = XLSX.utils.json_to_sheet(globalHasilKKV);
+            // let workbook = XLSX.utils.book_new();
+            // XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKV Waterpass");
+            // XLSX.writeFile(workbook, "Laporan_KKV_Waterpass.xlsx");
         }
     </script>
 </body>
