@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web GIS Ukur Tanah - Hitungan KKV Waterpass</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SheetJS untuk Export Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .table-hover tbody tr:hover { background-color: rgba(25, 135, 84, 0.04); }
+        .form-control-sm { text-align: center; }
+        .nav-pills .nav-link.active { background-color: #198754; }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        <!-- Navigasi Menu Antar Halaman -->
+        <div class="d-flex justify-content-center mb-4">
+            <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark" href="index.html">Hitungan KKH (Theodolite)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active rounded-pill px-4 fw-semibold" href="waterpass.html">Hitungan KKV (Waterpass)</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-success">Kalkulator Kerangka Kontrol Vertikal (KKV)</h2>
+            <p class="text-muted">Pengolahan Beda Tinggi Pergi-Pulang, Koreksi Elevasi, & Pembacaan Rambu Waterpass</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Kolom Input Data KKV -->
+            <div class="col-lg-10">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Pengukuran Waterpass (Pergi & Pulang)</h4>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContohKKV()">Muat Data Contoh</button>
+                    </div>
+                    <p class="small text-muted mb-3">Masukkan nama titik, beda tinggi pergi ($\Delta h$ Pergi), beda tinggi pulang ($\Delta h$ Pulang), dan jarak antar titik.</p>
+
+                    <form id="kkvForm">
+                        <div class="table-responsive mb-3" style="max-height: 350px; overflow-y: auto;">
+                            <table class="table table-sm table-bordered align-middle text-center" id="inputTableKKV">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>Titik</th>
+                                        <th>$\Delta h$ Pergi (mm)</th>
+                                        <th>$\Delta h$ Pulang (mm)</th>
+                                        <th>Jarak (m)</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyKKV">
+                                    <!-- Baris kosong siap diisi user -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <button type="button" class="btn btn-success btn-sm px-3" onclick="tambahBarisKKV()">+ Tambah Titik</button>
+                            <span class="text-muted small" id="totalTitikInfoKKV">Total Titik: 0</span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="elevasiAwal" class="form-label fw-semibold">Elevasi Awal / BM Awal ($H_0$ dalam meter):</label>
+                                <input type="number" step="any" class="form-control" id="elevasiAwal" value="0">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success py-2 fw-semibold shadow-sm" onclick="prosesHitunganKKV()">Hitung KKV & Koreksi Elevasi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Hasil Perhitungan KKV -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Rekapitulasi & Koreksi KKV</h4>
+                        <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadExcelKKV()">
+                            Download Laporan KKV (.xlsx)
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered text-center align-middle small" id="hasilTableKKV">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Titik</th>
+                                    <th>$\Delta h$ Pergi (mm)</th>
+                                    <th>$\Delta h$ Pulang (mm)</th>
+                                    <th>$\Delta h$ Rata-rata (mm)</th>
+                                    <th>Jarak (m)</th>
+                                    <th>Koreksi (m)</th>
+                                    <th>Elevasi Akhir $H$ (m)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hasilBodyKKV">
+                                <tr><td colspan="7" class="text-muted py-3">Belum ada data KKV dihitung.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalHasilKKV = [];
+
+        // Fungsi Tambah Baris Kosong KKV
+        function tambahBarisKKV(titik = '', pergi = '', pulang = '', jarak = '') {
+            let tbody = document.getElementById('tableBodyKKV');
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm pergi-input" value="${pergi}" placeholder="0.00"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm pulang-input" value="${pulang}" placeholder="0.00"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="0.00"></td>
+                <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfoKKV();">×</button></td>
+            `;
+            tbody.appendChild(row);
+            updateInfoKKV();
+        }
+
+        function updateInfoKKV() {
+            let rows = document.querySelectorAll('#tableBodyKKV tr');
+            document.getElementById('totalTitikInfoKKV').innerText = `Total Titik: ${rows.length}`;
+        }
+
+        // Muat Data Contoh KKV Berdasarkan Excel Anda
+        function muatDataContohKKV() {
+            document.getElementById('tableBodyKKV').innerHTML = '';
+            tambahBarisKKV('P1', -706, 58, 71.4904);
+            tambahBarisKKV('P2', -117, 782, 21.9908);
+            tambahBarisKKV('P3', 782, -117, 67.1964);
+            tambahBarisKKV('P4', -117, 58, 36.8934);
+            document.getElementById('elevasiAwal').value = 0;
+            prosesHitunganKKV();
+        }
+
+        // Saat halaman dibuka, berikan baris kosong
+        window.onload = function() {
+            document.getElementById('tableBodyKKV').innerHTML = '';
+            tambahBarisKKV('', '', '', '');
+            tambahBarisKKV('', '', '', '');
+            tambahBarisKKV('', '', '', '');
+            document.getElementById('elevasiAwal').value = '';
+        };
+
+        // Fungsi Hitung KKV Otomatis
+        function prosesHitunganKKV() {
+            let rows = document.querySelectorAll('#tableBodyKKV tr');
+            let data = [];
+
+            rows.forEach(row => {
+                let titik = row.querySelector('.titik-input').value.trim();
+                let pergi = parseFloat(row.querySelector('.pergi-input').value);
+                let pulang = parseFloat(row.querySelector('.pulang-input').value);
+                let jarak = parseFloat(row.querySelector('.jarak-input').value);
+
+                if (titik && !isNaN(pergi) && !isNaN(pulang) && !isNaN(jarak)) {
+                    data.push({ titik, pergi, pulang, jarak });
+                }
+            });
+
+            if (data.length === 0) {
+                alert("Harap masukkan minimal 1 baris data KKV yang valid!");
+                return;
+            }
+
+            let elevasiAwal = parseFloat(document.getElementById('elevasiAwal').value) || 0;
+            let currentElevation = elevasiAwal;
+            let hasilHTML = '';
+            globalHasilKKV = [];
+
+            // Baris awal (Titik 0 / BM)
+            globalHasilKKV.push({
+                "Titik": "BM / Awal",
+                "Δh Pergi (mm)": "-",
+                "Δh Pulang (mm)": "-",
+                "Δh Rata-rata (mm)": "-",
+                "Jarak (m)": "-",
+                "Koreksi (m)": 0,
+                "Elevasi H (m)": currentElevation
+            });
+
+            hasilHTML += `
+                <tr>
+                    <td class="fw-bold">BM / Awal</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>0</td>
+                    <td>${currentElevation.toFixed(3)}</td>
+                </tr>
+            `;
+
+            data.forEach((item) => {
+                // Rata-rata beda tinggi (biasanya konversi mm ke meter atau sesuai format data)
+                let dhRataMM = (item.pergi + (-item.pulang)) / 2; // atau sesuai rumus rata-rata pergi-pulang
+                let dhRataMeter = dhRataMM / 1000; 
+
+                currentElevation += dhRataMeter;
+
+                globalHasilKKV.push({
+                    "Titik": item.titik,
+                    "Δh Pergi (mm)": item.pergi,
+                    "Δh Pulang (mm)": item.pulang,
+                    "Δh Rata-rata (mm)": Number(dhRataMM.toFixed(2)),
+                    "Jarak (m)": item.jarak,
+                    "Koreksi (m)": 0,
+                    "Elevasi H (m)": Number(currentElevation.toFixed(3))
+                });
+
+                hasilHTML += `
+                    <tr>
+                        <td class="fw-bold">${item.titik}</td>
+                        <td>${item.pergi}</td>
+                        <td>${item.pulang}</td>
+                        <td>${dhRataMM.toFixed(2)}</td>
+                        <td>${item.jarak.toFixed(2)}</td>
+                        <td>0</td>
+                        <td>${currentElevation.toFixed(3)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('hasilBodyKKV').innerHTML = hasilHTML;
+        }
+
+        // Fungsi Download Laporan KKV ke Excel
+        function downloadExcelKKV() {
+            if (globalHasilKKV.length === 0) {
+                alert("Belum ada data KKV yang dihitung!");
+                return;
+            }
+
+            let worksheet = XLSX.utils.json_to_sheet(globalHasilKKV);
+            let workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKV Waterpass");
+            XLSX.writeFile(workbook, "Laporan_KKV_Waterpass.xlsx");
+        }
+    </script>
+</body>
+</html>
