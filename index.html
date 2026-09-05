@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRISTRIS - Hitung KKH & Poligon</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; width: 100%; border-radius: 8px; }
+        .card { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="fw-bold text-primary">Web GIS Pembelajaran Ukur Tanah</h1>
+            <p class="text-muted">Kalkulator Otomatis Kerangka Kontrol Horizontal (KKH) & Visualisasi Poligon</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Kolom Kiri: Input Data & Tombol -->
+            <div class="col-lg-6">
+                <div class="card p-4">
+                    <h4 class="mb-3">Data Lapangan Poligon</h4>
+                    <p class="small text-muted">Masukkan nama titik, sudut terukur (dalam derajat desimal), dan jarak (meter).</p>
+                    
+                    <button class="btn btn-outline-secondary btn-sm mb-3" onclick="muatDataContoh()">Muat Data Contoh (Dummy)</button>
+
+                    <form id="kkhForm">
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle" id="inputTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Titik</th>
+                                        <th>Sudut Terukur (°)</th>
+                                        <th>Jarak (m)</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <!-- Baris dinamis akan masuk ke sini -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm mb-3" onclick="tambahBaris()">+ Tambah Titik</button>
+                        
+                        <div class="mb-3">
+                            <label for="azimuthAwal" class="form-label fw-bold">Azimuth Awal ($\alpha_1$) dalam Derajat:</label>
+                            <input type="number" step="any" class="form-control" id="azimuthAwal" value="201.702778" required>
+                        </div>
+
+                        <button type="button" class="btn btn-primary w-100" onclick="prosesHitungan()">Hitung KKH & Gambar Peta</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Peta Web GIS -->
+            <div class="col-lg-6">
+                <div class="card p-4 h-100">
+                    <h4 class="mb-3">Visualisasi Peta Poligon</h4>
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Hasil Perhitungan -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card p-4">
+                    <h4 class="mb-3">Hasil Hitungan & Koreksi KKH</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered text-center align-middle" id="hasilTable">
+                            <table class="table table-striped table-bordered text-center align-middle" id="hasilTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Titik</th>
+                                        <th>Sudut Terkoreksi (°)</th>
+                                        <th>Azimuth (°)</th>
+                                        <th>$\Delta X$ (m)</th>
+                                        <th>$\Delta Y$ (m)</th>
+                                        <th>Easting ($X$)</th>
+                                        <th>Northing ($Y$)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hasilBody">
+                                    <tr><td colspan="7" class="text-muted">Belum ada data dihitung.</td></tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inisialisasi Peta Leaflet
+        var map = L.map('map').setView([-5.3971, 105.2668], 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        let polylineLayer = null;
+        let markersLayer = L.layerGroup().addTo(map);
+
+        // Fungsi Tambah Baris Form Input
+        function tambahBaris(titik = '', sudut = '', jarak = '') {
+            let tbody = document.getElementById('tableBody');
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm sudut-input" value="${sudut}" placeholder="72.59"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="71.49"></td>
+                <td class="text-center"><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Muat Data Contoh (Berdasarkan file Excel)
+        function muatDataContoh() {
+            document.getElementById('tableBody').innerHTML = '';
+            tambahBaris('P1', 72.594097, 71.490041);
+            tambahBaris('P2', 104.016319, 21.990786);
+            tambahBaris('P3', 87.863194, 67.196393);
+            tambahBaris('P4', 95.521528, 36.893387);
+            document.getElementById('azimuthAwal').value = 201.702778;
+        }
+
+        // Jalankan saat pertama kali buka
+        window.onload = function() {
+            muatDataContoh();
+            prosesHitungan();
+        };
+
+        // Fungsi Utama Hitung KKH & Update Peta
+        function prosesHitungan() {
+            let rows = document.querySelectorAll('#tableBody tr');
+            let data = [];
+            
+            rows.forEach(row => {
+                let titik = row.querySelector('.titik-input').value;
+                let sudutTerukur = parseFloat(row.querySelector('.sudut-input').value);
+                let jarak = parseFloat(row.querySelector('.jarak-input').value);
+                if(titik && !isNaN(sudutTerukur) && !isNaN(jarak)) {
+                    data.push({ titik, sudutTerukur, jarak });
+                }
+            });
+
+            if (data.length === 0) {
+                alert("Harap masukkan data minimal 1 titik!");
+                return;
+            }
+
+            let n = data.length;
+            let totalSudut = data.reduce((sum, item) => sum + item.sudutTerukur, 0);
+            let syaratSudut = (n - 2) * 180;
+            let errorSudut = totalSudut - syaratSudut;
+            let koreksiPerSudut = -errorSudut / n;
+
+            let azimuthAwal = parseFloat(document.getElementById('azimuthAwal').value);
+            let currentAzimuth = azimuthAwal;
+            let currentX = 0;
+            let currentY = 0;
+
+            let hasilHTML = '';
+            let latLngPoints = [];
+            
+            // Titik awal (0,0 lokal)
+            latLngPoints.push([currentY, currentX]);
+
+            data.forEach((item, index) => {
+                let sudutTerkoreksi = item.sudutTerukur + koreksiPerSudut;
+                
+                if (index > 0) {
+                    currentAzimuth = (currentAzimuth + sudutTerkoreksi - 180);
+                    if (currentAzimuth < 0) currentAzimuth += 360;
+                    if (currentAzimuth >= 360) currentAzimuth -= 360;
+                }
+
+                let rad = currentAzimuth * (Math.PI / 180);
+                let dX = item.jarak * Math.sin(rad);
+                let dY = item.jarak * Math.cos(rad);
+
+                currentX += dX;
+                currentY += dY;
+
+                latLngPoints.push([currentY, currentX]);
+
+                hasilHTML += `
+                    <tr>
+                        <td><b>${item.titik}</b></td>
+                        <td>${sudutTerkoreksi.toFixed(4)}°</td>
+                        <td>${currentAzimuth.toFixed(4)}°</td>
+                        <td>${dX.toFixed(4)}</td>
+                        <td>${dY.toFixed(4)}</td>
+                        <td>${currentX.toFixed(4)}</td>
+                        <td>${currentY.toFixed(4)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('hasilBody').innerHTML = hasilHTML;
+
+            // Update Peta Leaflet
+            markersLayer.clearLayers();
+            if (polylineLayer) map.removeLayer(polylineLayer);
+
+            // Karena koordinat lokal meter bisa langsung digambar, kita buat skala konversi kecil agar pas di peta Leaflet (lat/lng)
+            // Atau kita plot langsung koordinat meter relatif terhadap titik tengah peta
+            let baseLat = -5.3971;
+            let baseLng = 105.2668;
+            let scale = 0.00001; // faktor konversi meter ke derajat lintasan tipis
+
+            let mapPoints = latLngPoints.map(pt => [baseLat + (pt[1] * scale), baseLng + (pt[0] * scale)]);
+
+            polylineLayer = L.polyline(mapPoints, {color: 'red', weight: 4}).addTo(map);
+
+            mapPoints.forEach((pt, idx) => {
+                if(idx < data.length) {
+                    L.circleMarker(pt, {radius: 6, color: 'blue', fillColor: '#007bff', fillOpacity: 1})
+                      .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m`)
+                      .addTo(markersLayer);
+                }
+            });
+
+            map.fitBounds(polylineLayer.getBounds());
+        }
+    </script>
+</body>
+</html>
