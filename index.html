@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web GIS Ukur Tanah - KKH, Bowditch, & Grafik 3D</title>
+    <title>Web GIS Ukur Tanah - KKH (BA, BT, BB) & Bowditch</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
@@ -42,31 +42,31 @@
 
         <!-- Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah 3D</h2>
-            <p class="text-muted">Pengolahan KKH, Koreksi Bowditch, Visualisasi Peta, Grafik 3D, & Profil Horizontal</p>
+            <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah (Tachimetri KKH)</h2>
+            <p class="text-muted">Input Sudut DMS & Benang Rambu (BA, BT, BB) -> Hitung Jarak Otomatis -> Bowditch & Grafik 3D</p>
         </div>
 
         <div class="row g-4">
-            <!-- Kolom Kiri: Input Data DMS & Elevasi -->
+            <!-- Kolom Kiri: Input Data DMS, BA, BT, BB, Elevasi -->
             <div class="col-lg-6">
                 <div class="card p-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon (DMS & Z)</h4>
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon</h4>
                         <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContoh()">Muat Data Contoh</button>
                     </div>
-                    <p class="small text-muted mb-3">Masukkan nama titik, sudut (Deg, Min, Sec), jarak (m), dan tinggi/elevasi (m).</p>
+                    <p class="small text-muted mb-3">Masukkan nama titik, sudut (Deg, Min, Sec), pembacaan rambu BA, BT, BB, dan tinggi/elevasi (Z).</p>
 
                     <form id="kkhForm">
-                        <div class="table-responsive mb-3" style="max-height: 280px; overflow-y: auto;">
+                        <div class="table-responsive mb-3" style="max-height: 320px; overflow-y: auto;">
                             <table class="table table-sm table-bordered align-middle text-center" id="inputTable">
                                 <thead class="table-light sticky-top">
                                     <tr>
                                         <th>Titik</th>
-                                        <th>Deg (°)</th>
-                                        <th>Min (′)</th>
-                                        <th>Sec (″)</th>
-                                        <th>Jarak (m)</th>
-                                        <th>Elevasi (m)</th>
+                                        <th>Sudut (Deg° Min′ Sec″)</th>
+                                        <th>BA</th>
+                                        <th>BT</th>
+                                        <th>BB</th>
+                                        <th>Elevasi (Z)</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -82,20 +82,20 @@
                         </div>
                         
                         <div class="row mb-3">
-                            <label class="form-label fw-semibold">Azimuth Awal (α₁) Poligon:</label>
+                            <label class="form-label fw-semibold">Azimuth Awal (α1) Poligon:</label>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg">
+                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg (°) obat">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min">
+                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min (′)">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec">
+                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec (″)">
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung, Petakan, & Buat Grafik 3D</button>
+                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung Jarak Optis, Bowditch, & Grafik</button>
                         </div>
                     </form>
                 </div>
@@ -136,7 +136,7 @@
             <div class="col-12">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Hitungan & Koreksi Bowditch Otomatis</h4>
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Hitungan Otomatis (Takimetri & Bowditch)</h4>
                         <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadExcel()">
                             Download Laporan Excel (.xlsx)
                         </button>
@@ -148,6 +148,7 @@
                                     <th>Titik</th>
                                     <th>Sudut Terkoreksi</th>
                                     <th>Azimuth</th>
+                                    <th>Jarak D (m)</th>
                                     <th>ΔX (m)</th>
                                     <th>ΔY (m)</th>
                                     <th>Koreksi ΔX</th>
@@ -160,7 +161,7 @@
                                 </tr>
                             </thead>
                             <tbody id="hasilBody">
-                                <tr><td colspan="12" class="text-muted py-3">Belum ada data dihitung.</td></tr>
+                                <tr><td colspan="13" class="text-muted py-3">Belum ada data dihitung.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -193,16 +194,22 @@
             return `${d}° ${m}′ ${s}″`;
         }
 
-        function tambahBaris(titik = '', deg = '', min = '', sec = '', jarak = '', elev = '') {
+        function tambahBaris(titik = '', deg = '', min = '', sec = '', ba = '', bt = '', bb = '', elev = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
             row.innerHTML = `
                 <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
-                <td><input type="number" class="form-control form-control-sm deg-input" value="${deg}" placeholder="0"></td>
-                <td><input type="number" class="form-control form-control-sm min-input" value="${min}" placeholder="0"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm sec-input" value="${sec}" placeholder="0"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="0.00"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm elev-input" value="${elev}" placeholder="0.00"></td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="number" class="form-control deg-input" value="${deg}" placeholder="°">
+                        <input type="number" class="form-control min-input" value="${min}" placeholder="′">
+                        <input type="number" step="any" class="form-control sec-input" value="${sec}" placeholder="″">
+                    </div>
+                </td>
+                <td><input type="number" step="any" class="form-control form-control-sm ba-input" value="${ba}" placeholder="BA"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm bt-input" value="${bt}" placeholder="BT"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm bb-input" value="${bb}" placeholder="BB"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm elev-input" value="${elev}" placeholder="Z"></td>
                 <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfo();">×</button></td>
             `;
             tbody.appendChild(row);
@@ -216,10 +223,11 @@
 
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
-            tambahBaris('P1', 72, 35, 38.75, 71.49, 10.5);
-            tambahBaris('P2', 104, 0, 58.75, 21.99, 12.2);
-            tambahBaris('P3', 87, 51, 47.50, 67.19, 11.8);
-            tambahBaris('P4', 95, 31, 17.50, 36.89, 9.7);
+            // Contoh data dengan BA, BT, BB (Jarak dihitung (BA - BB) * 100)
+            tambahBaris('P1', 72, 35, 38, 1.964, 1.609, 1.25, 10.5);
+            tambahBaris('P2', 104, 0, 58, 1.109, 1.000, 0.890, 12.2);
+            tambahBaris('P3', 87, 51, 47, 1.871, 1.535, 1.20, 11.8);
+            tambahBaris('P4', 95, 31, 17, 1.358, 1.174, 0.989, 9.7);
             document.getElementById('aziDeg').value = 201;
             document.getElementById('aziMin').value = 42;
             document.getElementById('aziSec').value = 10;
@@ -228,9 +236,9 @@
 
         window.onload = function() {
             document.getElementById('tableBody').innerHTML = '';
-            tambahBaris('', '', '', '', '', '');
-            tambahBaris('', '', '', '', '', '');
-            tambahBaris('', '', '', '', '', '');
+            tambahBaris('', '', '', '', '', '', '', '');
+            tambahBaris('', '', '', '', '', '', '', '');
+            tambahBaris('', '', '', '', '', '', '', '');
             document.getElementById('aziDeg').value = '';
             document.getElementById('aziMin').value = '';
             document.getElementById('aziSec').value = '';
@@ -245,17 +253,23 @@
                 let deg = row.querySelector('.deg-input').value;
                 let min = row.querySelector('.min-input').value;
                 let sec = row.querySelector('.sec-input').value;
-                let jarak = parseFloat(row.querySelector('.jarak-input').value);
+                let ba = parseFloat(row.querySelector('.ba-input').value);
+                let bt = parseFloat(row.querySelector('.bt-input').value);
+                let bb = parseFloat(row.querySelector('.bb-input').value);
                 let elevasi = parseFloat(row.querySelector('.elev-input').value);
                 
                 let sudutDec = dmsToDec(deg, min, sec);
-                if(titik && !isNaN(sudutDec) && !isNaN(jarak)) {
-                    data.push({ titik, sudutDec, deg, min, sec, jarak, elevasi: isNaN(elevasi) ? 0 : elevasi });
+                
+                // Hitung jarak optis takimetri: D = (BA - BB) * 100
+                let jarak = (!isNaN(ba) && !isNaN(bb)) ? (ba - bb) * 100 : 0;
+
+                if (titik && !isNaN(sudutDec) && jarak > 0) {
+                    data.push({ titik, sudutDec, deg, min, sec, ba, bt, bb, jarak, elevasi: isNaN(elevasi) ? 0 : elevasi });
                 }
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan minimal 1 baris data valid!");
+                alert("Harap masukkan data yang valid! Pastikan Benang Atas (BA) dan Benang Bawah (BB) terisi dengan benar agar jarak dapat dihitung.");
                 return;
             }
 
@@ -345,7 +359,7 @@
                     "Titik": calc.titik,
                     "Sudut Terkoreksi": decToDmsStr(calc.sudutTerkoreksiDec),
                     "Azimuth": decToDmsStr(calc.azimuthDec),
-                    "Jarak (m)": calc.jarak,
+                    "Jarak D (m)": Number(calc.jarak.toFixed(3)),
                     "ΔX (m)": Number(calc.dX.toFixed(4)),
                     "ΔY (m)": Number(calc.dY.toFixed(4)),
                     "Koreksi ΔX": Number(korDX.toFixed(4)),
@@ -362,6 +376,7 @@
                         <td class="fw-bold">${calc.titik}</td>
                         <td>${decToDmsStr(calc.sudutTerkoreksiDec)}</td>
                         <td>${decToDmsStr(calc.azimuthDec)}</td>
+                        <td>${calc.jarak.toFixed(3)}</td>
                         <td>${calc.dX.toFixed(3)}</td>
                         <td>${calc.dY.toFixed(3)}</td>
                         <td class="text-danger">${korDX.toFixed(3)}</td>
@@ -379,7 +394,7 @@
 
             let errorSec = (Math.abs(errorSudutDec) * 3600).toFixed(1);
             document.getElementById('summaryBox').innerHTML = `
-                <b>Analisis Hasil Ukur Tanah:</b><br>
+                <b>Analisis Hasil Ukur Tanah (Takimetri & Bowditch):</b><br>
                 • Kesalahan Sudut (fβ): <b>${errorSec} detik″</b><br>
                 • Kesalahan Linier (E): <b>${linearError.toFixed(3)} meter</b><br>
                 • Tingkat Ketelitian (TOR): <span class="badge bg-success">1 : ${torRatio.toLocaleString()}</span>
@@ -436,7 +451,7 @@
             mapPoints.forEach((pt, idx) => {
                 if(idx < data.length) {
                     L.circleMarker(pt, {radius: 7, color: '#fff', weight: 2, fillColor: '#dc3545', fillOpacity: 1})
-                      .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m<br>Z: ${data[idx].elevasi} m`)
+                      .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>Jarak: ${data[idx].jarak.toFixed(2)} m<br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m<br>Z: ${data[idx].elevasi} m`)
                       .addTo(markersLayer);
                 }
             });
@@ -454,8 +469,8 @@
 
             let worksheet = XLSX.utils.json_to_sheet(globalHasilData);
             let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Bowditch & Z 3D");
-            XLSX.writeFile(workbook, "Laporan_Bowditch_3D.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Takimetri Bowditch");
+            XLSX.writeFile(workbook, "Laporan_Takimetri_Bowditch.xlsx");
         }
     </script>
 </body>
