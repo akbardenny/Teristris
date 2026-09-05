@@ -52,7 +52,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody">
-                                    <!-- Baris dinamis -->
+                                    <!-- Baris kosong siap diisi user -->
                                 </tbody>
                             </table>
                         </div>
@@ -65,13 +65,13 @@
                         <div class="row mb-3">
                             <label class="form-label fw-semibold">Azimuth Awal (α₁) Poligon:</label>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg" value="201">
+                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg" value="">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min" value="42">
+                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min" value="">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec" value="10">
+                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec" value="">
                             </div>
                         </div>
 
@@ -90,7 +90,7 @@
                         <div id="map" class="mb-3"></div>
                     </div>
                     <div class="info-box" id="summaryBox">
-                        <b>Status Hitungan:</b> Belum diproses. Masukkan data ukur tanah di samping lalu klik hitung.
+                        <b>Status Hitungan:</b> Belum diproses. Silakan masukkan data ukur tanah di samping lalu klik hitung.
                     </div>
                 </div>
             </div>
@@ -181,7 +181,7 @@
             document.getElementById('totalTitikInfo').innerText = `Total Titik: ${rows.length}`;
         }
 
-        // Muat Data Contoh Standar Berdasarkan Excel Anda
+        // Muat Data Contoh (Opsional jika ingin tes cepat)
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
             tambahBaris('P1', 72, 35, 38.75, 71.490041);
@@ -194,8 +194,16 @@
             prosesHitungan();
         }
 
+        // Saat halaman dimuat pertama kali, tabel dikosongkan agar user isi sendiri
         window.onload = function() {
-            muatDataContoh();
+            document.getElementById('tableBody').innerHTML = '';
+            // Memberikan 3 baris kosong awal agar rapi dan siap diketik
+            tambahBaris('', '', '', '', '');
+            tambahBaris('', '', '', '', '');
+            tambahBaris('', '', '', '', '');
+            document.getElementById('aziDeg').value = '';
+            document.getElementById('aziMin').value = '';
+            document.getElementById('aziSec').value = '';
         };
 
         // Fungsi Utama Hitung KKH, Sudut, & Bowditch Otomatis
@@ -217,7 +225,7 @@
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan minimal 1 baris data valid!");
+                alert("Harap masukkan minimal 1 baris data valid (Nama Titik, Sudut DMS, dan Jarak wajib diisi)!");
                 return;
             }
 
@@ -282,7 +290,6 @@
 
             // Langkah 2: Terapkan Koreksi Bowditch Proporsional & Koordinat Akhir
             rawCalculations.forEach((calc) => {
-                // Koreksi Bowditch: - (jarak / totalJarak) * fx
                 let korDX = - (calc.jarak / totalJarak) * fx;
                 let korDY = - (calc.jarak / totalJarak) * fy;
 
