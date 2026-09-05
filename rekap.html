@@ -19,15 +19,15 @@
 </head>
 <body>
 
-    <div class="container py-5">
+    <div class="container-fluid px-4 py-5">
         <!-- Tombol Navigasi Antar Halaman -->
         <div class="d-flex justify-content-center mb-4" style="position: relative; z-index: 1050;">
             <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./index.html">Hitungan KKH & Grafik 3D</a>
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./index.html">Hitungan KKH (Theodolite)</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./waterpass.html">Hitungan KKV (Waterpass)</a>
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./waterpass.html">Hitungan KKV & Grafik 3D</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./rekap.html">Audit & Deteksi Anomali</a>
@@ -41,17 +41,17 @@
             <p class="text-muted">Pemeriksaan otomatis kualitas pengukuran KKH & KKV untuk mendeteksi anomali dan data yang tidak masuk akal</p>
         </div>
 
-        <!-- Panel Kontrol & Input Data Gabungan -->
+        <!-- Panel Kontrol Luas -->
         <div class="row g-4 justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-xl-10">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h4 class="mb-0 fs-5 fw-bold text-secondary">Masukkan Data Gabungan Pengukuran</h4>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="muatDataSimulasiAnomali()">Muat Data Simulasi (Ada Error)</button>
+                        <button class="btn btn-outline-secondary btn-sm px-3" onclick="muatDataSimulasiAnomali()">Muat Data Simulasi (Ada Error)</button>
                     </div>
                     <p class="small text-muted mb-3">Sistem akan menganalisis selisih pergi-pulang waterpass dan kelurusan sudut poligon secara otomatis.</p>
 
-                    <div class="table-responsive mb-3" style="max-height: 350px; overflow-y: auto;">
+                    <div class="table-responsive mb-3" style="max-height: 380px; overflow-y: auto;">
                         <table class="table table-sm table-bordered align-middle text-center" id="inputTableAudit">
                             <thead class="table-light sticky-top">
                                 <tr>
@@ -70,29 +70,28 @@
                     </div>
                     
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <button type="button" class="btn btn-danger btn-sm px-3" onclick="tambahBarisAudit()">+ Tambah Titik</button>
-                        <span class="text-muted small" id="totalTitikInfoAudit">Total Titik: 0</span>
+                        <button type="button" class="btn btn-danger btn-sm px-4" onclick="tambahBarisAudit()">+ Tambah Titik</button>
+                        <span class="text-muted small fw-semibold" id="totalTitikInfoAudit">Total Titik: 0</span>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-danger py-2 fw-semibold shadow-sm" onclick="jalankanAuditAnomali()">Jalankan Pemeriksaan Anomali & Kualitas</button>
+                        <button type="button" class="btn btn-danger py-3 fw-semibold shadow-sm fs-6" onclick="jalankanAuditAnomali()">Jalankan Pemeriksaan Anomali & Kualitas</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Hasil Audit & Log Peringatan Anomali -->
-        <div class="row mt-5">
-            <div class="col-12">
+        <!-- Hasil Audit Luas -->
+        <div class="row mt-5 justify-content-center">
+            <div class="col-xl-10">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h4 class="mb-0 fs-5 fw-bold text-secondary">Laporan Hasil Audit & Peringatan Kesalahan</h4>
-                        <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadLaporanAudit()">
+                        <button type="button" class="btn btn-success btn-sm px-4 shadow-sm" onclick="downloadLaporanAudit()">
                             Download Laporan Audit (.xlsx)
                         </button>
                     </div>
 
-                    <!-- Kotak Ringkasan Status -->
                     <div class="alert alert-secondary mb-4" id="auditAlertBox" role="alert">
                         Belum ada audit yang dijalankan. Silakan masukkan data dan klik tombol pemeriksaan di atas.
                     </div>
@@ -109,7 +108,7 @@
                                 </tr>
                             </thead>
                             <tbody id="hasilBodyAudit">
-                                <tr><td colspan="5" class="text-muted py-3">Belum ada data yang diaudit.</td></tr>
+                                <tr><td colspan="5" class="text-muted py-4">Belum ada data yang diaudit.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -155,7 +154,7 @@
             document.getElementById('tableBodyAudit').innerHTML = '';
             tambahBarisAudit('P1', 72, 35, 38, 71.49, -706, 58);
             tambahBarisAudit('P2', 104, 0, 58, 21.99, -117, 782);
-            tambahBarisAudit('P3', 87, 51, 47, 67.19, -4500, 1200); // Anomali ekstrem
+            tambahBarisAudit('P3', 87, 51, 47, 67.19, -4500, 1200);
             tambahBarisAudit('P4', 95, 31, 17, 36.89, -117, 58);
             jalankanAuditAnomali();
         }
@@ -217,7 +216,7 @@
                     totalAnomaliDitemukan++;
                 }
 
-                globalHasilAudit.push({
+                    globalHasilAudit.push({
                     "Titik": item.titik,
                     "Kesalahan Sudut Total (detik)": Number(errorSudutSec.toFixed(2)),
                     "Δh Pergi (mm)": item.pergi,
