@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web GIS Ukur Tanah - Hitungan KKV Waterpass</title>
+    <title>Web GIS Ukur Tanah - KKV, Model 3D, & Penampang Memanjang</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Plotly.js untuk Grafik 3D & Profil Memanjang -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <!-- SheetJS untuk Export Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -18,15 +20,15 @@
 </head>
 <body>
 
-    <div class="container py-5">
+    <div class="container-fluid px-4 py-5">
         <!-- Tombol Navigasi Antar Halaman -->
         <div class="d-flex justify-content-center mb-4" style="position: relative; z-index: 1050;">
             <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
                 <li class="nav-item">
-                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./index.html">Hitungan KKH & Grafik 3D</a>
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./index.html">Hitungan KKH (Theodolite)</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./waterpass.html">Hitungan KKV (Waterpass)</a>
+                    <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./waterpass.html">Hitungan KKV & Grafik 3D</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./rekap.html">Audit & Deteksi Anomali</a>
@@ -36,21 +38,22 @@
 
         <!-- Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-success">Kalkulator Kerangka Kontrol Vertikal (KKV)</h2>
-            <p class="text-muted">Pengolahan Beda Tinggi Pergi-Pulang, Koreksi Elevasi, & Pembacaan Rambu Waterpass</p>
+            <h2 class="fw-bold text-success">Kerangka Kontrol Vertikal (KKV) & Visualisasi 3D</h2>
+            <p class="text-muted">Pengolahan Beda Tinggi Pergi-Pulang, Model Jalur 3D, & Penampang Memanjang (Longitudinal Profile)</p>
         </div>
 
+        <!-- Ruang Input Lebar -->
         <div class="row g-4 justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-xl-10">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Pengukuran Waterpass (Pergi & Pulang)</h4>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContohKKV()">Muat Data Contoh</button>
+                        <button class="btn btn-outline-secondary btn-sm px-3" onclick="muatDataContohKKV()">Muat Data Contoh</button>
                     </div>
-                    <p class="small text-muted mb-3">Masukkan nama titik, beda tinggi pergi (Δh Pergi), beda tinggi pulang (Δh Pulang), dan jarak antar titik.</p>
+                    <p class="small text-muted mb-3">Masukkan nama titik, beda tinggi pergi (Δh Pergi dalam mm), beda tinggi pulang (Δh Pulang dalam mm), dan jarak antar titik (m).</p>
 
                     <form id="kkvForm">
-                        <div class="table-responsive mb-3" style="max-height: 350px; overflow-y: auto;">
+                        <div class="table-responsive mb-3" style="max-height: 380px; overflow-y: auto;">
                             <table class="table table-sm table-bordered align-middle text-center" id="inputTableKKV">
                                 <thead class="table-light sticky-top">
                                     <tr>
@@ -68,32 +71,48 @@
                         </div>
                         
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <button type="button" class="btn btn-success btn-sm px-3" onclick="tambahBarisKKV()">+ Tambah Titik</button>
-                            <span class="text-muted small" id="totalTitikInfoKKV">Total Titik: 0</span>
+                            <button type="button" class="btn btn-success btn-sm px-4" onclick="tambahBarisKKV()">+ Tambah Titik</button>
+                            <span class="text-muted small fw-semibold" id="totalTitikInfoKKV">Total Titik: 0</span>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="elevasiAwal" class="form-label fw-semibold">Elevasi Awal / BM Awal (H0 dalam meter):</label>
-                                <input type="number" step="any" class="form-control" id="elevasiAwal" value="">
+                                <input type="number" step="any" class="form-control" id="elevasiAwal" placeholder="0.00">
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-success py-2 fw-semibold shadow-sm" onclick="prosesHitunganKKV()">Hitung KKV & Koreksi Elevasi</button>
+                            <button type="button" class="btn btn-success py-3 fw-semibold shadow-sm fs-6" onclick="prosesHitunganKKV()">Hitung KKV, Model 3D, & Profil Memanjang</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Tabel Hasil Perhitungan KKV -->
-        <div class="row mt-5">
-            <div class="col-12">
+        <!-- Bagian Grafik 3D & Profil Memanjang (Dipindah ke KKV) -->
+        <div class="row g-4 mt-3 justify-content-center">
+            <div class="col-xl-6">
+                <div class="card p-4">
+                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Model Jalur Leveling 3D (X-Kumulatif, Offset Y, Elevasi Z)</h4>
+                    <div id="plot3dKKV" style="height: 450px; width: 100%;"></div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card p-4">
+                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Penampang Memanjang Jalur Waterpass (Elevasi vs Jarak)</h4>
+                    <div id="plotProfileKKV" style="height: 450px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Hasil Perhitungan KKV Luas -->
+        <div class="row mt-4 justify-content-center">
+            <div class="col-xl-10">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Rekapitulasi & Koreksi KKV</h4>
-                        <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadExcelKKV()">
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Rekapitulasi & Koreksi Elevasi KKV</h4>
+                        <button type="button" class="btn btn-success btn-sm px-4 shadow-sm" onclick="downloadExcelKKV()">
                             Download Laporan KKV (.xlsx)
                         </button>
                     </div>
@@ -106,12 +125,13 @@
                                     <th>Δh Pulang (mm)</th>
                                     <th>Δh Rata-rata (mm)</th>
                                     <th>Jarak (m)</th>
+                                    <th>Jarak Kumulatif (m)</th>
                                     <th>Koreksi (m)</th>
                                     <th>Elevasi Akhir H (m)</th>
                                 </tr>
                             </thead>
                             <tbody id="hasilBodyKKV">
-                                <tr><td colspan="7" class="text-muted py-3">Belum ada data KKV dihitung.</td></tr>
+                                <tr><td colspan="8" class="text-muted py-4">Belum ada data KKV dihitung.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -144,11 +164,11 @@
 
         function muatDataContohKKV() {
             document.getElementById('tableBodyKKV').innerHTML = '';
-            tambahBarisKKV('P1', -706, 58, 71.4904);
-            tambahBarisKKV('P2', -117, 782, 21.9908);
-            tambahBarisKKV('P3', 782, -117, 67.1964);
-            tambahBarisKKV('P4', -117, 58, 36.8934);
-            document.getElementById('elevasiAwal').value = 0;
+            tambahBarisKKV('P1', -706, 58, 71.49);
+            tambahBarisKKV('P2', -117, 782, 21.99);
+            tambahBarisKKV('P3', 782, -117, 67.19);
+            tambahBarisKKV('P4', -117, 58, 36.89);
+            document.getElementById('elevasiAwal').value = 10.0;
             prosesHitunganKKV();
         }
 
@@ -185,12 +205,20 @@
             let hasilHTML = '';
             globalHasilKKV = [];
 
+            let plotX = [0];
+            let plotY = [0];
+            let plotZ = [currentElevation];
+            let plotLabels = ["BM Awal"];
+            let cumulativeDistances = [0];
+            let distAcc = 0;
+
             globalHasilKKV.push({
                 "Titik": "BM / Awal",
                 "Δh Pergi (mm)": "-",
                 "Δh Pulang (mm)": "-",
                 "Δh Rata-rata (mm)": "-",
                 "Jarak (m)": "-",
+                "Jarak Kumulatif (m)": 0,
                 "Koreksi (m)": 0,
                 "Elevasi H (m)": currentElevation
             });
@@ -202,6 +230,7 @@
                     <td>-</td>
                     <td>-</td>
                     <td>-</td>
+                    <td>0.00</td>
                     <td>0</td>
                     <td>${currentElevation.toFixed(3)}</td>
                 </tr>
@@ -212,6 +241,13 @@
                 let dhRataMeter = dhRataMM / 1000; 
 
                 currentElevation += dhRataMeter;
+                distAcc += item.jarak;
+
+                plotX.push(distAcc);
+                plotY.push(0);
+                plotZ.push(currentElevation);
+                plotLabels.push(item.titik);
+                cumulativeDistances.push(distAcc);
 
                 globalHasilKKV.push({
                     "Titik": item.titik,
@@ -219,6 +255,7 @@
                     "Δh Pulang (mm)": item.pulang,
                     "Δh Rata-rata (mm)": Number(dhRataMM.toFixed(2)),
                     "Jarak (m)": item.jarak,
+                    "Jarak Kumulatif (m)": Number(distAcc.toFixed(2)),
                     "Koreksi (m)": 0,
                     "Elevasi H (m)": Number(currentElevation.toFixed(3))
                 });
@@ -230,6 +267,7 @@
                         <td>${item.pulang}</td>
                         <td>${dhRataMM.toFixed(2)}</td>
                         <td>${item.jarak.toFixed(2)}</td>
+                        <td>${distAcc.toFixed(2)}</td>
                         <td>0</td>
                         <td>${currentElevation.toFixed(3)}</td>
                     </tr>
@@ -237,6 +275,46 @@
             });
 
             document.getElementById('hasilBodyKKV').innerHTML = hasilHTML;
+
+            // Render Plotly 3D KKV
+            let trace3d = {
+                x: plotX,
+                y: plotY,
+                z: plotZ,
+                mode: 'lines+markers+text',
+                text: plotLabels,
+                textposition: 'top center',
+                type: 'scatter3d',
+                line: { width: 6, color: '#198754' },
+                marker: { size: 6, color: '#0d6efd' }
+            };
+            let layout3d = {
+                margin: { l: 0, r: 0, b: 0, t: 0 },
+                scene: {
+                    xaxis: { title: 'Jarak Kumulatif (m)' },
+                    yaxis: { title: 'Offset Jalur (Y)' },
+                    zaxis: { title: 'Elevasi H (m)' }
+                }
+            };
+            Plotly.newPlot('plot3dKKV', [trace3d], layout3d);
+
+            // Render Plotly Profil Memanjang KKV
+            let traceProfile = {
+                x: cumulativeDistances,
+                y: plotZ,
+                mode: 'lines+markers+text',
+                text: plotLabels,
+                textposition: 'top center',
+                type: 'scatter',
+                line: { shape: 'linear', width: 3, color: '#198754' },
+                marker: { size: 8, color: '#0d6efd' }
+            };
+            let layoutProfile = {
+                margin: { l: 40, r: 20, b: 40, t: 20 },
+                xaxis: { title: 'Jarak Kumulatif (m)' },
+                yaxis: { title: 'Elevasi H (m)' }
+            };
+            Plotly.newPlot('plotProfileKKV', [traceProfile], layoutProfile);
         }
 
         function downloadExcelKKV() {
