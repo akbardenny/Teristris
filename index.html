@@ -49,7 +49,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody">
-                                    <!-- Baris dinamis -->
+                                    <!-- Baris kosong akan digenerate otomatis saat halaman dibuka -->
                                 </tbody>
                             </table>
                         </div>
@@ -61,7 +61,7 @@
                         
                         <div class="mb-3">
                             <label for="azimuthAwal" class="form-label fw-semibold">Azimuth Awal (α₁) dalam Derajat:</label>
-                            <input type="number" step="any" class="form-control" id="azimuthAwal" value="201.702778" required>
+                            <input type="number" step="any" class="form-control" id="azimuthAwal" value="0" required>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -127,16 +127,16 @@
 
         let polylineLayer = null;
         let markersLayer = L.layerGroup().addTo(map);
-        let globalHasilData = []; // Menyimpan data hasil untuk export excel
+        let globalHasilData = [];
 
-        // Fungsi Tambah Baris Form Input
+        // Fungsi Tambah Baris Form Input (Kosong secara default)
         function tambahBaris(titik = '', sudut = '', jarak = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
             row.innerHTML = `
                 <td><input type="text" class="form-control form-control-sm text-center titik-input" value="${titik}" placeholder="P1"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm text-center sudut-input" value="${sudut}" placeholder="72.59"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm text-center jarak-input" value="${jarak}" placeholder="71.49"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm text-center sudut-input" value="${sudut}" placeholder="0.00"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm text-center jarak-input" value="${jarak}" placeholder="0.00"></td>
                 <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfo();">×</button></td>
             `;
             tbody.appendChild(row);
@@ -148,7 +148,7 @@
             document.getElementById('totalTitikInfo').innerText = `Total Titik: ${rows.length}`;
         }
 
-        // Muat Data Contoh Standar
+        // Muat Data Contoh (Opsional jika user ingin tes cepat)
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
             tambahBaris('P1', 72.594097, 71.490041);
@@ -159,9 +159,15 @@
             prosesHitungan();
         }
 
-        // Jalankan saat pertama kali halaman dimuat
+        // Saat halaman dimuat pertama kali, sediakan beberapa baris kosong untuk diisi user
         window.onload = function() {
-            muatDataContoh();
+            document.getElementById('tableBody').innerHTML = '';
+            // Berikan 3 baris kosong awal agar user langsung bisa mengetik
+            tambahBaris('P1', '', '');
+            tambahBaris('P2', '', '');
+            tambahBaris('P3', '', '');
+            tambahBaris('P4', '', '');
+            document.getElementById('azimuthAwal').value = '';
         };
 
         // Fungsi Utama Hitung KKH & Update Peta
@@ -179,7 +185,7 @@
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan data minimal 1 titik yang valid!");
+                alert("Harap masukkan minimal 1 baris data titik, sudut, dan jarak yang valid!");
                 return;
             }
 
@@ -189,14 +195,14 @@
             let errorSudut = totalSudut - syaratSudut;
             let koreksiPerSudut = -errorSudut / n;
 
-            let azimuthAwal = parseFloat(document.getElementById('azimuthAwal').value);
+            let azimuthAwal = parseFloat(document.getElementById('azimuthAwal').value) || 0;
             let currentAzimuth = azimuthAwal;
             let currentX = 0;
             let currentY = 0;
 
             let hasilHTML = '';
             let latLngPoints = [];
-            globalHasilData = []; // Reset data export
+            globalHasilData = [];
 
             latLngPoints.push([currentY, currentX]);
 
@@ -218,7 +224,6 @@
 
                 latLngPoints.push([currentY, currentX]);
 
-                // Simpan untuk tabel dan excel
                 globalHasilData.push({
                     "Titik": item.titik,
                     "Sudut Terkoreksi (°)": Number(sudutTerkoreksi.toFixed(4)),
@@ -272,16 +277,13 @@
         // Fungsi Download ke Format Excel (.xlsx)
         function downloadExcel() {
             if (globalHasilData.length === 0) {
-                alert("Belum ada data hasil hitungan untuk diunduh!");
+                alert("Belum ada data hasil hitungan untuk diunduh! Lakukan hitungan terlebih dahulu.");
                 return;
             }
 
-            // Buat worksheet dari data JSON
             let worksheet = XLSX.utils.json_to_sheet(globalHasilData);
             let workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKH");
-
-            // Unduh file dengan nama KKH_Hasil_Hitungan.xlsx
             XLSX.writeFile(workbook, "KKH_Hasil_Hitungan.xlsx");
         }
     </script>
