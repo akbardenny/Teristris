@@ -17,11 +17,24 @@
         .table-hover tbody tr:hover { background-color: rgba(13, 110, 253, 0.04); }
         .form-control-sm { text-align: center; }
         .info-box { background: #e8f4fd; border-left: 4px solid #0d6efd; padding: 12px; border-radius: 4px; font-size: 0.9rem; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; }
     </style>
 </head>
 <body>
 
     <div class="container py-5">
+        <!-- Tombol Navigasi Antar Halaman -->
+        <div class="d-flex justify-content-center mb-4">
+            <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
+                <li class="nav-item">
+                    <a class="nav-link active rounded-pill px-4 fw-semibold" href="index.html">Hitungan KKH (Theodolite)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark" href="waterpass.html">Hitungan KKV (Waterpass)</a>
+                </li>
+            </ul>
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-5">
             <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah</h2>
@@ -136,7 +149,6 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inisialisasi Peta Leaflet
         var map = L.map('map').setView([-5.3971, 105.2668], 17);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
@@ -146,12 +158,10 @@
         let markersLayer = L.layerGroup().addTo(map);
         let globalHasilData = [];
 
-        // Konversi DMS ke Desimal Derajat
         function dmsToDec(deg, min, sec) {
             return parseFloat(deg || 0) + (parseFloat(min || 0) / 60) + (parseFloat(sec || 0) / 3600);
         }
 
-        // Konversi Desimal Derajat ke Format DMS String
         function decToDmsStr(decimal) {
             let d = Math.floor(decimal);
             let mDecimal = (decimal - d) * 60;
@@ -160,7 +170,6 @@
             return `${d}° ${m}′ ${s}″`;
         }
 
-        // Tambah Baris Form Input
         function tambahBaris(titik = '', deg = '', min = '', sec = '', jarak = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
@@ -181,7 +190,6 @@
             document.getElementById('totalTitikInfo').innerText = `Total Titik: ${rows.length}`;
         }
 
-        // Muat Data Contoh (Opsional jika ingin tes cepat)
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
             tambahBaris('P1', 72, 35, 38.75, 71.490041);
@@ -194,10 +202,8 @@
             prosesHitungan();
         }
 
-        // Saat halaman dimuat pertama kali, tabel dikosongkan agar user isi sendiri
         window.onload = function() {
             document.getElementById('tableBody').innerHTML = '';
-            // Memberikan 3 baris kosong awal agar rapi dan siap diketik
             tambahBaris('', '', '', '', '');
             tambahBaris('', '', '', '', '');
             tambahBaris('', '', '', '', '');
@@ -206,7 +212,6 @@
             document.getElementById('aziSec').value = '';
         };
 
-        // Fungsi Utama Hitung KKH, Sudut, & Bowditch Otomatis
         function prosesHitungan() {
             let rows = document.querySelectorAll('#tableBody tr');
             let data = [];
@@ -232,22 +237,19 @@
             let n = data.length;
             let totalSudutDec = data.reduce((sum, item) => sum + item.sudutDec, 0);
             let syaratSudutDec = (n - 2) * 180;
-            let errorSudutDec = totalSudutDec - syaratSudutDec; // f_beta
+            let errorSudutDec = totalSudutDec - syaratSudutDec;
             let koreksiPerSudutDec = -errorSudutDec / n;
 
-            // Azimuth Awal
             let aziDeg = document.getElementById('aziDeg').value;
             let aziMin = document.getElementById('aziMin').value;
             let aziSec = document.getElementById('aziSec').value;
             let currentAzimuth = dmsToDec(aziDeg, aziMin, aziSec);
 
             let totalJarak = data.reduce((sum, item) => sum + item.jarak, 0);
-
             let rawCalculations = [];
             let sumDeltaX = 0;
             let sumDeltaY = 0;
 
-            // Langkah 1: Hitung Sudut Terkoreksi, Azimuth, dan Delta Mentah
             data.forEach((item, index) => {
                 let sudutTerkoreksiDec = item.sudutDec + koreksiPerSudutDec;
                 
@@ -274,7 +276,6 @@
                 });
             });
 
-            // Kesalahan Linier (Linear Misclosure) untuk Bowditch
             let fx = sumDeltaX;
             let fy = sumDeltaY;
             let linearError = Math.sqrt(fx * fx + fy * fy);
@@ -288,7 +289,6 @@
 
             latLngPoints.push([currentY, currentX]);
 
-            // Langkah 2: Terapkan Koreksi Bowditch Proporsional & Koordinat Akhir
             rawCalculations.forEach((calc) => {
                 let korDX = - (calc.jarak / totalJarak) * fx;
                 let korDY = - (calc.jarak / totalJarak) * fy;
@@ -335,7 +335,6 @@
 
             document.getElementById('hasilBody').innerHTML = hasilHTML;
 
-            // Tampilkan Ringkasan Informasi TOR & Kesalahan Sudut
             let errorSec = (Math.abs(errorSudutDec) * 3600).toFixed(1);
             document.getElementById('summaryBox').innerHTML = `
                 <b>Analisis Hasil Ukur Tanah:</b><br>
@@ -344,7 +343,6 @@
                 • Tingkat Ketelitian (TOR): <span class="badge bg-success">1 : ${torRatio.toLocaleString()}</span>
             `;
 
-            // Update Peta Leaflet
             markersLayer.clearLayers();
             if (polylineLayer) map.removeLayer(polylineLayer);
 
@@ -353,7 +351,6 @@
             let scale = 0.00001; 
 
             let mapPoints = latLngPoints.map(pt => [baseLat + (pt[1] * scale), baseLng + (pt[0] * scale)]);
-
             polylineLayer = L.polyline(mapPoints, {color: '#0d6efd', weight: 4, opacity: 0.8}).addTo(map);
 
             mapPoints.forEach((pt, idx) => {
@@ -369,7 +366,6 @@
             }
         }
 
-        // Fungsi Download ke Excel (.xlsx)
         function downloadExcel() {
             if (globalHasilData.length === 0) {
                 alert("Belum ada data hasil hitungan untuk diunduh!");
