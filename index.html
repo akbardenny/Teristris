@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web GIS Ukur Tanah - KKH & Poligon</title>
+    <title>Web GIS Ukur Tanah - Hitungan KKH & Bowditch</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
@@ -12,10 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s ease; }
-        #map { height: 480px; width: 100%; border-radius: 8px; z-index: 1; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        #map { height: 500px; width: 100%; border-radius: 8px; z-index: 1; }
         .table-hover tbody tr:hover { background-color: rgba(13, 110, 253, 0.04); }
-        .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); border-color: #86b7fe; }
+        .form-control-sm { text-align: center; }
+        .info-box { background: #e8f4fd; border-left: 4px solid #0d6efd; padding: 12px; border-radius: 4px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -23,91 +24,107 @@
     <div class="container py-5">
         <!-- Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-primary">Web GIS Pembelajaran Ukur Tanah</h2>
-            <p class="text-muted">Kalkulator Otomatis Kerangka Kontrol Horizontal (KKH) & Visualisasi Poligon Interaktif</p>
+            <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah</h2>
+            <p class="text-muted">Pengolahan Kerangka Kontrol Horizontal (KKH), Koreksi Bowditch Otomatis, & TOR</p>
         </div>
 
         <div class="row g-4">
-            <!-- Kolom Kiri: Input Data -->
+            <!-- Kolom Kiri: Input Data DMS -->
             <div class="col-lg-6">
                 <div class="card p-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon</h4>
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon (DMS)</h4>
                         <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContoh()">Muat Data Contoh</button>
                     </div>
-                    <p class="small text-muted mb-3">Masukkan nama titik, sudut terukur (dalam format desimal derajat), dan jarak (meter).</p>
+                    <p class="small text-muted mb-3">Masukkan nama titik, sudut terukur (Derajat, Menit, Detik), dan jarak (meter).</p>
 
                     <form id="kkhForm">
-                        <div class="table-responsive mb-3" style="max-height: 280px; overflow-y: auto;">
+                        <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
                             <table class="table table-sm table-bordered align-middle text-center" id="inputTable">
                                 <thead class="table-light sticky-top">
                                     <tr>
                                         <th>Titik</th>
-                                        <th>Sudut Terukur (°)</th>
+                                        <th>Deg (°)</th>
+                                        <th>Min (′)</th>
+                                        <th>Sec (″)</th>
                                         <th>Jarak (m)</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody">
-                                    <!-- Baris kosong akan digenerate otomatis saat halaman dibuka -->
+                                    <!-- Baris dinamis -->
                                 </tbody>
                             </table>
                         </div>
                         
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <button type="button" class="btn btn-success btn-sm px-3" onclick="tambahBaris()">+ Tambah Titik</button>
                             <span class="text-muted small" id="totalTitikInfo">Total Titik: 0</span>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="azimuthAwal" class="form-label fw-semibold">Azimuth Awal (α₁) dalam Derajat:</label>
-                            <input type="number" step="any" class="form-control" id="azimuthAwal" value="0" required>
+                        <div class="row mb-3">
+                            <label class="form-label fw-semibold">Azimuth Awal (α₁) Poligon:</label>
+                            <div class="col-4">
+                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg" value="201">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min" value="42">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec" value="10">
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung KKH & Perbarui Peta</button>
+                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung Bowditch & Perbarui Peta</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Kolom Kanan: Peta Web GIS -->
+            <!-- Kolom Kanan: Peta Web GIS & Ringkasan Info -->
             <div class="col-lg-6">
-                <div class="card p-4 h-100">
-                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Peta Poligon</h4>
-                    <div id="map"></div>
+                <div class="card p-4 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Peta Poligon</h4>
+                        <div id="map" class="mb-3"></div>
+                    </div>
+                    <div class="info-box" id="summaryBox">
+                        <b>Status Hitungan:</b> Belum diproses. Masukkan data ukur tanah di samping lalu klik hitung.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tabel Hasil Perhitungan -->
+        <!-- Tabel Hasil Perhitungan & Koreksi Bowditch -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Hitungan & Koreksi KKH</h4>
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Hasil Hitungan & Koreksi Bowditch Otomatis</h4>
                         <button type="button" class="btn btn-success btn-sm shadow-sm" onclick="downloadExcel()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill me-1" viewBox="0 0 16 16">
-                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z"/>
-                            </svg>
-                            Download Excel (.xlsx)
+                            Download Laporan Excel (.xlsx)
                         </button>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered text-center align-middle" id="hasilTable">
+                        <table class="table table-hover table-bordered text-center align-middle small" id="hasilTable">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Titik</th>
-                                    <th>Sudut Terkoreksi (°)</th>
-                                    <th>Azimuth (°)</th>
+                                    <th>Sudut Terkoreksi</th>
+                                    <th>Azimuth</th>
                                     <th>ΔX (m)</th>
                                     <th>ΔY (m)</th>
+                                    <th>Koreksi ΔX</th>
+                                    <th>Koreksi ΔY</th>
+                                    <th>ΔX Terkoreksi</th>
+                                    <th>ΔY Terkoreksi</th>
                                     <th>Easting (X)</th>
                                     <th>Northing (Y)</th>
                                 </tr>
                             </thead>
                             <tbody id="hasilBody">
-                                <tr><td colspan="7" class="text-muted py-3">Belum ada data dihitung. Silakan masukkan data di atas.</td></tr>
+                                <tr><td colspan="11" class="text-muted py-3">Belum ada data dihitung.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -129,14 +146,30 @@
         let markersLayer = L.layerGroup().addTo(map);
         let globalHasilData = [];
 
-        // Fungsi Tambah Baris Form Input (Kosong secara default)
-        function tambahBaris(titik = '', sudut = '', jarak = '') {
+        // Konversi DMS ke Desimal Derajat
+        function dmsToDec(deg, min, sec) {
+            return parseFloat(deg || 0) + (parseFloat(min || 0) / 60) + (parseFloat(sec || 0) / 3600);
+        }
+
+        // Konversi Desimal Derajat ke Format DMS String
+        function decToDmsStr(decimal) {
+            let d = Math.floor(decimal);
+            let mDecimal = (decimal - d) * 60;
+            let m = Math.floor(mDecimal);
+            let s = ((mDecimal - m) * 60).toFixed(1);
+            return `${d}° ${m}′ ${s}″`;
+        }
+
+        // Tambah Baris Form Input
+        function tambahBaris(titik = '', deg = '', min = '', sec = '', jarak = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
             row.innerHTML = `
-                <td><input type="text" class="form-control form-control-sm text-center titik-input" value="${titik}" placeholder="P1"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm text-center sudut-input" value="${sudut}" placeholder="0.00"></td>
-                <td><input type="number" step="any" class="form-control form-control-sm text-center jarak-input" value="${jarak}" placeholder="0.00"></td>
+                <td><input type="text" class="form-control form-control-sm titik-input" value="${titik}" placeholder="P1"></td>
+                <td><input type="number" class="form-control form-control-sm deg-input" value="${deg}" placeholder="0"></td>
+                <td><input type="number" class="form-control form-control-sm min-input" value="${min}" placeholder="0"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm sec-input" value="${sec}" placeholder="0"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="0.00"></td>
                 <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfo();">×</button></td>
             `;
             tbody.appendChild(row);
@@ -148,69 +181,70 @@
             document.getElementById('totalTitikInfo').innerText = `Total Titik: ${rows.length}`;
         }
 
-        // Muat Data Contoh (Opsional jika user ingin tes cepat)
+        // Muat Data Contoh Standar Berdasarkan Excel Anda
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
-            tambahBaris('P1', 72.594097, 71.490041);
-            tambahBaris('P2', 104.016319, 21.990786);
-            tambahBaris('P3', 87.863194, 67.196393);
-            tambahBaris('P4', 95.521528, 36.893387);
-            document.getElementById('azimuthAwal').value = 201.702778;
+            tambahBaris('P1', 72, 35, 38.75, 71.490041);
+            tambahBaris('P2', 104, 0, 58.75, 21.990786);
+            tambahBaris('P3', 87, 51, 47.50, 67.196393);
+            tambahBaris('P4', 95, 31, 17.50, 36.893387);
+            document.getElementById('aziDeg').value = 201;
+            document.getElementById('aziMin').value = 42;
+            document.getElementById('aziSec').value = 10;
             prosesHitungan();
         }
 
-        // Saat halaman dimuat pertama kali, sediakan beberapa baris kosong untuk diisi user
         window.onload = function() {
-            document.getElementById('tableBody').innerHTML = '';
-            // Berikan 3 baris kosong awal agar user langsung bisa mengetik
-            tambahBaris('P1', '', '');
-            tambahBaris('P2', '', '');
-            tambahBaris('P3', '', '');
-            tambahBaris('P4', '', '');
-            document.getElementById('azimuthAwal').value = '';
+            muatDataContoh();
         };
 
-        // Fungsi Utama Hitung KKH & Update Peta
+        // Fungsi Utama Hitung KKH, Sudut, & Bowditch Otomatis
         function prosesHitungan() {
             let rows = document.querySelectorAll('#tableBody tr');
             let data = [];
             
             rows.forEach(row => {
                 let titik = row.querySelector('.titik-input').value.trim();
-                let sudutTerukur = parseFloat(row.querySelector('.sudut-input').value);
+                let deg = row.querySelector('.deg-input').value;
+                let min = row.querySelector('.min-input').value;
+                let sec = row.querySelector('.sec-input').value;
                 let jarak = parseFloat(row.querySelector('.jarak-input').value);
-                if(titik && !isNaN(sudutTerukur) && !isNaN(jarak)) {
-                    data.push({ titik, sudutTerukur, jarak });
+                
+                let sudutDec = dmsToDec(deg, min, sec);
+                if(titik && !isNaN(sudutDec) && !isNaN(jarak)) {
+                    data.push({ titik, sudutDec, deg, min, sec, jarak });
                 }
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan minimal 1 baris data titik, sudut, dan jarak yang valid!");
+                alert("Harap masukkan minimal 1 baris data valid!");
                 return;
             }
 
             let n = data.length;
-            let totalSudut = data.reduce((sum, item) => sum + item.sudutTerukur, 0);
-            let syaratSudut = (n - 2) * 180;
-            let errorSudut = totalSudut - syaratSudut;
-            let koreksiPerSudut = -errorSudut / n;
+            let totalSudutDec = data.reduce((sum, item) => sum + item.sudutDec, 0);
+            let syaratSudutDec = (n - 2) * 180;
+            let errorSudutDec = totalSudutDec - syaratSudutDec; // f_beta
+            let koreksiPerSudutDec = -errorSudutDec / n;
 
-            let azimuthAwal = parseFloat(document.getElementById('azimuthAwal').value) || 0;
-            let currentAzimuth = azimuthAwal;
-            let currentX = 0;
-            let currentY = 0;
+            // Azimuth Awal
+            let aziDeg = document.getElementById('aziDeg').value;
+            let aziMin = document.getElementById('aziMin').value;
+            let aziSec = document.getElementById('aziSec').value;
+            let currentAzimuth = dmsToDec(aziDeg, aziMin, aziSec);
 
-            let hasilHTML = '';
-            let latLngPoints = [];
-            globalHasilData = [];
+            let totalJarak = data.reduce((sum, item) => sum + item.jarak, 0);
 
-            latLngPoints.push([currentY, currentX]);
+            let rawCalculations = [];
+            let sumDeltaX = 0;
+            let sumDeltaY = 0;
 
+            // Langkah 1: Hitung Sudut Terkoreksi, Azimuth, dan Delta Mentah
             data.forEach((item, index) => {
-                let sudutTerkoreksi = item.sudutTerukur + koreksiPerSudut;
+                let sudutTerkoreksiDec = item.sudutDec + koreksiPerSudutDec;
                 
                 if (index > 0) {
-                    currentAzimuth = (currentAzimuth + sudutTerkoreksi - 180);
+                    currentAzimuth = (currentAzimuth + sudutTerkoreksiDec - 180);
                     if (currentAzimuth < 0) currentAzimuth += 360;
                     if (currentAzimuth >= 360) currentAzimuth -= 360;
                 }
@@ -219,35 +253,89 @@
                 let dX = item.jarak * Math.sin(rad);
                 let dY = item.jarak * Math.cos(rad);
 
-                currentX += dX;
-                currentY += dY;
+                sumDeltaX += dX;
+                sumDeltaY += dY;
+
+                rawCalculations.push({
+                    titik: item.titik,
+                    sudutTerkoreksiDec,
+                    azimuthDec: currentAzimuth,
+                    jarak: item.jarak,
+                    dX,
+                    dY
+                });
+            });
+
+            // Kesalahan Linier (Linear Misclosure) untuk Bowditch
+            let fx = sumDeltaX;
+            let fy = sumDeltaY;
+            let linearError = Math.sqrt(fx * fx + fy * fy);
+            let torRatio = Math.round(totalJarak / linearError);
+
+            let currentX = 0;
+            let currentY = 0;
+            let hasilHTML = '';
+            let latLngPoints = [];
+            globalHasilData = [];
+
+            latLngPoints.push([currentY, currentX]);
+
+            // Langkah 2: Terapkan Koreksi Bowditch Proporsional & Koordinat Akhir
+            rawCalculations.forEach((calc) => {
+                // Koreksi Bowditch: - (jarak / totalJarak) * fx
+                let korDX = - (calc.jarak / totalJarak) * fx;
+                let korDY = - (calc.jarak / totalJarak) * fy;
+
+                let dX_terkoreksi = calc.dX + korDX;
+                let dY_terkoreksi = calc.dY + korDY;
+
+                currentX += dX_terkoreksi;
+                currentY += dY_terkoreksi;
 
                 latLngPoints.push([currentY, currentX]);
 
                 globalHasilData.push({
-                    "Titik": item.titik,
-                    "Sudut Terkoreksi (°)": Number(sudutTerkoreksi.toFixed(4)),
-                    "Azimuth (°)": Number(currentAzimuth.toFixed(4)),
-                    "ΔX (m)": Number(dX.toFixed(4)),
-                    "ΔY (m)": Number(dY.toFixed(4)),
+                    "Titik": calc.titik,
+                    "Sudut Terkoreksi": decToDmsStr(calc.sudutTerkoreksiDec),
+                    "Azimuth": decToDmsStr(calc.azimuthDec),
+                    "Jarak (m)": calc.jarak,
+                    "ΔX (m)": Number(calc.dX.toFixed(4)),
+                    "ΔY (m)": Number(calc.dY.toFixed(4)),
+                    "Koreksi ΔX": Number(korDX.toFixed(4)),
+                    "Koreksi ΔY": Number(korDY.toFixed(4)),
+                    "ΔX Terkoreksi": Number(dX_terkoreksi.toFixed(4)),
+                    "ΔY Terkoreksi": Number(dY_terkoreksi.toFixed(4)),
                     "Easting X (m)": Number(currentX.toFixed(4)),
                     "Northing Y (m)": Number(currentY.toFixed(4))
                 });
 
                 hasilHTML += `
                     <tr>
-                        <td class="fw-bold">${item.titik}</td>
-                        <td>${sudutTerkoreksi.toFixed(4)}°</td>
-                        <td>${currentAzimuth.toFixed(4)}°</td>
-                        <td>${dX.toFixed(4)}</td>
-                        <td>${dY.toFixed(4)}</td>
-                        <td>${currentX.toFixed(4)}</td>
-                        <td>${currentY.toFixed(4)}</td>
+                        <td class="fw-bold">${calc.titik}</td>
+                        <td>${decToDmsStr(calc.sudutTerkoreksiDec)}</td>
+                        <td>${decToDmsStr(calc.azimuthDec)}</td>
+                        <td>${calc.dX.toFixed(3)}</td>
+                        <td>${calc.dY.toFixed(3)}</td>
+                        <td class="text-danger">${korDX.toFixed(3)}</td>
+                        <td class="text-danger">${korDY.toFixed(3)}</td>
+                        <td>${dX_terkoreksi.toFixed(3)}</td>
+                        <td>${dY_terkoreksi.toFixed(3)}</td>
+                        <td>${currentX.toFixed(3)}</td>
+                        <td>${currentY.toFixed(3)}</td>
                     </tr>
                 `;
             });
 
             document.getElementById('hasilBody').innerHTML = hasilHTML;
+
+            // Tampilkan Ringkasan Informasi TOR & Kesalahan Sudut
+            let errorSec = (Math.abs(errorSudutDec) * 3600).toFixed(1);
+            document.getElementById('summaryBox').innerHTML = `
+                <b>Analisis Hasil Ukur Tanah:</b><br>
+                • Kesalahan Sudut (fβ): <b>${errorSec} detik″</b><br>
+                • Kesalahan Linier (E): <b>${linearError.toFixed(3)} meter</b><br>
+                • Tingkat Ketelitian (TOR): <span class="badge bg-success">1 : ${torRatio.toLocaleString()}</span>
+            `;
 
             // Update Peta Leaflet
             markersLayer.clearLayers();
@@ -274,17 +362,17 @@
             }
         }
 
-        // Fungsi Download ke Format Excel (.xlsx)
+        // Fungsi Download ke Excel (.xlsx)
         function downloadExcel() {
             if (globalHasilData.length === 0) {
-                alert("Belum ada data hasil hitungan untuk diunduh! Lakukan hitungan terlebih dahulu.");
+                alert("Belum ada data hasil hitungan untuk diunduh!");
                 return;
             }
 
             let worksheet = XLSX.utils.json_to_sheet(globalHasilData);
             let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil KKH");
-            XLSX.writeFile(workbook, "KKH_Hasil_Hitungan.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Bowditch KKH");
+            XLSX.writeFile(workbook, "Laporan_Bowditch_KKH.xlsx");
         }
     </script>
 </body>
