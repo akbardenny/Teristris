@@ -6,7 +6,7 @@
     <title>Web GIS Ukur Tanah - Audit & Deteksi Anomali</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- SheetJS untuk Export Excel -->
+    <!-- SheetJS untuk Export & Import Excel/CSV -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -49,7 +49,15 @@
                         <h4 class="mb-0 fs-5 fw-bold text-secondary">Masukkan Data Gabungan Pengukuran</h4>
                         <button class="btn btn-outline-secondary btn-sm px-3" onclick="muatDataSimulasiAnomali()">Muat Data Simulasi (Ada Error)</button>
                     </div>
-                    <p class="small text-muted mb-3">Sistem akan menganalisis selisih pergi-pulang waterpass dan kelurusan sudut poligon secara otomatis.</p>
+
+                    <!-- Kotak Import CSV Audit -->
+                    <div class="mb-3 p-3 bg-light rounded border border-danger-subtle">
+                        <label class="form-label small fw-semibold text-danger mb-1">Atau Import Data dari File CSV / Excel:</label>
+                        <input type="file" id="csvFileAudit" accept=".csv, .xlsx, .xls" class="form-control form-control-sm" onchange="importFileAudit(event)">
+                        <div class="form-text text-muted" style="font-size: 0.75rem;">Format kolom file: Titik, Deg, Min, Sec, Jarak, Pergi, Pulang</div>
+                    </div>
+
+                    <p class="small text-muted mb-2">Sistem akan menganalisis selisih pergi-pulang waterpass dan kelurusan sudut poligon secara otomatis.</p>
 
                     <div class="table-responsive mb-3" style="max-height: 380px; overflow-y: auto;">
                         <table class="table table-sm table-bordered align-middle text-center" id="inputTableAudit">
@@ -159,6 +167,33 @@
             jalankanAuditAnomali();
         }
 
+        // Fungsi Import File CSV/Excel Audit
+        function importFileAudit(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                let workbook = XLSX.read(data, {type: 'array'});
+                let firstSheet = workbook.SheetNames[0];
+                let json = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+                document.getElementById('tableBodyAudit').innerHTML = '';
+                json.forEach(row => {
+                    let titik = row.Titik || row.titik || row.TITIK || '';
+                    let deg = row.Deg || row.deg || 0;
+                    let min = row.Min || row.min || 0;
+                    let sec = row.Sec || row.sec || 0;
+                    let jarak = row.Jarak || row.jarak || 0;
+                    let pergi = row.Pergi || row.pergi || 0;
+                    let pulang = row.Pulang || row.pulang || 0;
+                    if(titik) tambahBarisAudit(titik, deg, min, sec, jarak, pergi, pulang);
+                });
+                alert("Data CSV Audit berhasil diimport!");
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
         window.onload = function() {
             document.getElementById('tableBodyAudit').innerHTML = '';
             tambahBarisAudit('', '', '', '', '', '', '');
@@ -216,7 +251,7 @@
                     totalAnomaliDitemukan++;
                 }
 
-                    globalHasilAudit.push({
+                globalHasilAudit.push({
                     "Titik": item.titik,
                     "Kesalahan Sudut Total (detik)": Number(errorSudutSec.toFixed(2)),
                     "Δh Pergi (mm)": item.pergi,
