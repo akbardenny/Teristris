@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web GIS Ukur Tanah - Hitungan KKH & Bowditch</title>
+    <title>Web GIS Ukur Tanah - KKH, Bowditch, & Grafik 3D</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Plotly.js untuk Grafik 3D & Profil -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <!-- SheetJS untuk Export Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        #map { height: 500px; width: 100%; border-radius: 8px; z-index: 1; }
+        #map { height: 450px; width: 100%; border-radius: 8px; z-index: 1; }
         .table-hover tbody tr:hover { background-color: rgba(13, 110, 253, 0.04); }
         .form-control-sm { text-align: center; }
         .info-box { background: #e8f4fd; border-left: 4px solid #0d6efd; padding: 12px; border-radius: 4px; font-size: 0.9rem; }
@@ -23,35 +25,39 @@
 <body>
 
     <div class="container py-5">
-<!-- Tombol Navigasi Antar Halaman -->
-<div class="d-flex justify-content-center mb-4" style="position: relative; z-index: 1050;">
-    <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
-        <li class="nav-item">
-            <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./index.html">Hitungan KKH & Grafik 3D</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./waterpass.html">Hitungan KKV (Waterpass)</a>
-        </li>
-    </ul>
-</div>
+        <!-- Tombol Navigasi Antar Halaman -->
+        <div class="d-flex justify-content-center mb-4" style="position: relative; z-index: 1050;">
+            <ul class="nav nav-pills gap-2 shadow-sm p-1 bg-white rounded-pill">
+                <li class="nav-item">
+                    <a class="nav-link active rounded-pill px-4 fw-semibold text-decoration-none" href="./index.html">Hitungan KKH & Grafik 3D</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./waterpass.html">Hitungan KKV (Waterpass)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill px-4 text-dark text-decoration-none" href="./rekap.html">Audit & Deteksi Anomali</a>
+                </li>
+            </ul>
+        </div>
+
         <!-- Header -->
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah</h2>
-            <p class="text-muted">Pengolahan Kerangka Kontrol Horizontal (KKH), Koreksi Bowditch Otomatis, & TOR</p>
+            <h2 class="fw-bold text-primary">Web GIS & Kalkulator Ukur Tanah 3D</h2>
+            <p class="text-muted">Pengolahan KKH, Koreksi Bowditch, Visualisasi Peta, Grafik 3D, & Profil Horizontal</p>
         </div>
 
         <div class="row g-4">
-            <!-- Kolom Kiri: Input Data DMS -->
+            <!-- Kolom Kiri: Input Data DMS & Elevasi -->
             <div class="col-lg-6">
                 <div class="card p-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon (DMS)</h4>
+                        <h4 class="mb-0 fs-5 fw-bold text-secondary">Data Lapangan Poligon (DMS & Z)</h4>
                         <button class="btn btn-outline-secondary btn-sm" onclick="muatDataContoh()">Muat Data Contoh</button>
                     </div>
-                    <p class="small text-muted mb-3">Masukkan nama titik, sudut terukur (Derajat, Menit, Detik), dan jarak (meter).</p>
+                    <p class="small text-muted mb-3">Masukkan nama titik, sudut (Deg, Min, Sec), jarak (m), dan tinggi/elevasi (m).</p>
 
                     <form id="kkhForm">
-                        <div class="table-responsive mb-3" style="max-height: 300px; overflow-y: auto;">
+                        <div class="table-responsive mb-3" style="max-height: 280px; overflow-y: auto;">
                             <table class="table table-sm table-bordered align-middle text-center" id="inputTable">
                                 <thead class="table-light sticky-top">
                                     <tr>
@@ -60,6 +66,7 @@
                                         <th>Min (′)</th>
                                         <th>Sec (″)</th>
                                         <th>Jarak (m)</th>
+                                        <th>Elevasi (m)</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -77,38 +84,54 @@
                         <div class="row mb-3">
                             <label class="form-label fw-semibold">Azimuth Awal (α₁) Poligon:</label>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg" value="">
+                                <input type="number" class="form-control form-control-sm" id="aziDeg" placeholder="Deg">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min" value="">
+                                <input type="number" class="form-control form-control-sm" id="aziMin" placeholder="Min">
                             </div>
                             <div class="col-4">
-                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec" value="">
+                                <input type="number" class="form-control form-control-sm" id="aziSec" placeholder="Sec">
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung Bowditch & Perbarui Peta</button>
+                            <button type="button" class="btn btn-primary py-2 fw-semibold shadow-sm" onclick="prosesHitungan()">Hitung, Petakan, & Buat Grafik 3D</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Kolom Kanan: Peta Web GIS & Ringkasan Info -->
+            <!-- Kolom Kanan: Peta Web GIS -->
             <div class="col-lg-6">
                 <div class="card p-4 h-100 d-flex flex-column justify-content-between">
                     <div>
-                        <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Peta Poligon</h4>
-                        <div id="map" class="mb-3"></div>
+                        <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Peta 2D (Leaflet)</h4>
+                        <div id="map"></div>
                     </div>
-                    <div class="info-box" id="summaryBox">
-                        <b>Status Hitungan:</b> Belum diproses. Silakan masukkan data ukur tanah di samping lalu klik hitung.
+                    <div class="info-box mt-3" id="summaryBox">
+                        <b>Status Hitungan:</b> Belum diproses. Silakan masukkan data ukur tanah di samping.
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tabel Hasil Perhitungan & Koreksi Bowditch -->
+        <!-- Bagian Grafik 3D & Profil Horizontal -->
+        <div class="row g-4 mt-2">
+            <div class="col-lg-6">
+                <div class="card p-4">
+                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Visualisasi Poligon 3D (X, Y, Z)</h4>
+                    <div id="plot3d" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card p-4">
+                    <h4 class="mb-3 fs-5 fw-bold text-secondary">Grafik Profil Penampang Memanjang</h4>
+                    <div id="plotProfile" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Hasil Perhitungan -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card p-4">
@@ -133,10 +156,11 @@
                                     <th>ΔY Terkoreksi</th>
                                     <th>Easting (X)</th>
                                     <th>Northing (Y)</th>
+                                    <th>Elevasi (Z)</th>
                                 </tr>
                             </thead>
                             <tbody id="hasilBody">
-                                <tr><td colspan="11" class="text-muted py-3">Belum ada data dihitung.</td></tr>
+                                <tr><td colspan="12" class="text-muted py-3">Belum ada data dihitung.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -169,7 +193,7 @@
             return `${d}° ${m}′ ${s}″`;
         }
 
-        function tambahBaris(titik = '', deg = '', min = '', sec = '', jarak = '') {
+        function tambahBaris(titik = '', deg = '', min = '', sec = '', jarak = '', elev = '') {
             let tbody = document.getElementById('tableBody');
             let row = document.createElement('tr');
             row.innerHTML = `
@@ -178,6 +202,7 @@
                 <td><input type="number" class="form-control form-control-sm min-input" value="${min}" placeholder="0"></td>
                 <td><input type="number" step="any" class="form-control form-control-sm sec-input" value="${sec}" placeholder="0"></td>
                 <td><input type="number" step="any" class="form-control form-control-sm jarak-input" value="${jarak}" placeholder="0.00"></td>
+                <td><input type="number" step="any" class="form-control form-control-sm elev-input" value="${elev}" placeholder="0.00"></td>
                 <td><button type="button" class="btn btn-outline-danger btn-sm px-2 py-0" onclick="this.closest('tr').remove(); updateInfo();">×</button></td>
             `;
             tbody.appendChild(row);
@@ -191,10 +216,10 @@
 
         function muatDataContoh() {
             document.getElementById('tableBody').innerHTML = '';
-            tambahBaris('P1', 72, 35, 38.75, 71.490041);
-            tambahBaris('P2', 104, 0, 58.75, 21.990786);
-            tambahBaris('P3', 87, 51, 47.50, 67.196393);
-            tambahBaris('P4', 95, 31, 17.50, 36.893387);
+            tambahBaris('P1', 72, 35, 38.75, 71.49, 10.5);
+            tambahBaris('P2', 104, 0, 58.75, 21.99, 12.2);
+            tambahBaris('P3', 87, 51, 47.50, 67.19, 11.8);
+            tambahBaris('P4', 95, 31, 17.50, 36.89, 9.7);
             document.getElementById('aziDeg').value = 201;
             document.getElementById('aziMin').value = 42;
             document.getElementById('aziSec').value = 10;
@@ -203,9 +228,9 @@
 
         window.onload = function() {
             document.getElementById('tableBody').innerHTML = '';
-            tambahBaris('', '', '', '', '');
-            tambahBaris('', '', '', '', '');
-            tambahBaris('', '', '', '', '');
+            tambahBaris('', '', '', '', '', '');
+            tambahBaris('', '', '', '', '', '');
+            tambahBaris('', '', '', '', '', '');
             document.getElementById('aziDeg').value = '';
             document.getElementById('aziMin').value = '';
             document.getElementById('aziSec').value = '';
@@ -221,15 +246,16 @@
                 let min = row.querySelector('.min-input').value;
                 let sec = row.querySelector('.sec-input').value;
                 let jarak = parseFloat(row.querySelector('.jarak-input').value);
+                let elevasi = parseFloat(row.querySelector('.elev-input').value);
                 
                 let sudutDec = dmsToDec(deg, min, sec);
                 if(titik && !isNaN(sudutDec) && !isNaN(jarak)) {
-                    data.push({ titik, sudutDec, deg, min, sec, jarak });
+                    data.push({ titik, sudutDec, deg, min, sec, jarak, elevasi: isNaN(elevasi) ? 0 : elevasi });
                 }
             });
 
             if (data.length === 0) {
-                alert("Harap masukkan minimal 1 baris data valid (Nama Titik, Sudut DMS, dan Jarak wajib diisi)!");
+                alert("Harap masukkan minimal 1 baris data valid!");
                 return;
             }
 
@@ -270,6 +296,7 @@
                     sudutTerkoreksiDec,
                     azimuthDec: currentAzimuth,
                     jarak: item.jarak,
+                    elevasi: item.elevasi,
                     dX,
                     dY
                 });
@@ -288,6 +315,13 @@
 
             latLngPoints.push([currentY, currentX]);
 
+            let plotX = [0];
+            let plotY = [0];
+            let plotZ = [rawCalculations[0].elevasi];
+            let plotLabels = [rawCalculations[0].titik];
+            let cumulativeDistance = [0];
+            let distAcc = 0;
+
             rawCalculations.forEach((calc) => {
                 let korDX = - (calc.jarak / totalJarak) * fx;
                 let korDY = - (calc.jarak / totalJarak) * fy;
@@ -299,6 +333,13 @@
                 currentY += dY_terkoreksi;
 
                 latLngPoints.push([currentY, currentX]);
+                plotX.push(currentX);
+                plotY.push(currentY);
+                plotZ.push(calc.elevasi);
+                plotLabels.push(calc.titik);
+
+                distAcc += calc.jarak;
+                cumulativeDistance.push(distAcc);
 
                 globalHasilData.push({
                     "Titik": calc.titik,
@@ -312,7 +353,8 @@
                     "ΔX Terkoreksi": Number(dX_terkoreksi.toFixed(4)),
                     "ΔY Terkoreksi": Number(dY_terkoreksi.toFixed(4)),
                     "Easting X (m)": Number(currentX.toFixed(4)),
-                    "Northing Y (m)": Number(currentY.toFixed(4))
+                    "Northing Y (m)": Number(currentY.toFixed(4)),
+                    "Elevasi Z (m)": calc.elevasi
                 });
 
                 hasilHTML += `
@@ -328,6 +370,7 @@
                         <td>${dY_terkoreksi.toFixed(3)}</td>
                         <td>${currentX.toFixed(3)}</td>
                         <td>${currentY.toFixed(3)}</td>
+                        <td>${calc.elevasi.toFixed(3)}</td>
                     </tr>
                 `;
             });
@@ -342,6 +385,44 @@
                 • Tingkat Ketelitian (TOR): <span class="badge bg-success">1 : ${torRatio.toLocaleString()}</span>
             `;
 
+            let trace3d = {
+                x: plotX,
+                y: plotY,
+                z: plotZ,
+                mode: 'lines+markers+text',
+                text: plotLabels,
+                textposition: 'top center',
+                type: 'scatter3d',
+                line: { width: 6, color: '#0d6efd' },
+                marker: { size: 6, color: '#dc3545' }
+            };
+            let layout3d = {
+                margin: { l: 0, r: 0, b: 0, t: 0 },
+                scene: {
+                    xaxis: { title: 'Easting (X)' },
+                    yaxis: { title: 'Northing (Y)' },
+                    zaxis: { title: 'Elevasi (Z)' }
+                }
+            };
+            Plotly.newPlot('plot3d', [trace3d], layout3d);
+
+            let traceProfile = {
+                x: cumulativeDistance,
+                y: plotZ,
+                mode: 'lines+markers+text',
+                text: plotLabels,
+                textposition: 'top center',
+                type: 'scatter',
+                line: { shape: 'linear', width: 3, color: '#198754' },
+                marker: { size: 8, color: '#0d6efd' }
+            };
+            let layoutProfile = {
+                margin: { l: 40, r: 20, b: 40, t: 20 },
+                xaxis: { title: 'Jarak Kumulatif (m)' },
+                yaxis: { title: 'Elevasi (m)' }
+            };
+            Plotly.newPlot('plotProfile', [traceProfile], layoutProfile);
+
             markersLayer.clearLayers();
             if (polylineLayer) map.removeLayer(polylineLayer);
 
@@ -355,7 +436,7 @@
             mapPoints.forEach((pt, idx) => {
                 if(idx < data.length) {
                     L.circleMarker(pt, {radius: 7, color: '#fff', weight: 2, fillColor: '#dc3545', fillOpacity: 1})
-                      .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m`)
+                      .bindPopup(`<b>Titik: ${data[idx].titik}</b><br>X: ${latLngPoints[idx+1][0].toFixed(2)} m<br>Y: ${latLngPoints[idx+1][1].toFixed(2)} m<br>Z: ${data[idx].elevasi} m`)
                       .addTo(markersLayer);
                 }
             });
@@ -373,8 +454,8 @@
 
             let worksheet = XLSX.utils.json_to_sheet(globalHasilData);
             let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Bowditch KKH");
-            XLSX.writeFile(workbook, "Laporan_Bowditch_KKH.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Bowditch & Z 3D");
+            XLSX.writeFile(workbook, "Laporan_Bowditch_3D.xlsx");
         }
     </script>
 </body>
