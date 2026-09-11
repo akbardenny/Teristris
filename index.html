@@ -55,7 +55,7 @@
                         </div>
                         <div>
                             <h1 class="text-white font-bold text-base leading-tight">Teristris GIS</h1>
-                            <span class="text-xs text-slate-400">Engineering Sheet Engine</span>
+                            <span class="text-xs text-slate-400">Kalkulator Data Otomatis</span>
                         </div>
                     </div>
                     <button id="sidebarClose" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
@@ -80,15 +80,23 @@
                         </div>
                     </button>
 
+                    <button onclick="switchTab('detail')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="detail">
+                        <i class="fas fa-map-marked-alt w-5"></i>
+                        <div class="text-left">
+                            <div>Perhitungan Detail Situasi</div>
+                            <span class="text-[10px] text-slate-400">Tacheometry & Cek Pergeseran</span>
+                        </div>
+                    </button>
+
                     <button onclick="switchTab('audit')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="audit">
                         <i class="fas fa-shield-alt w-5"></i>
-                        <span>Audit & Anomali Data</span>
+                        <span>Audit & Anomali Poligon</span>
                     </button>
                 </nav>
             </div>
 
             <div class="px-2 text-xs text-slate-500 border-t border-slate-800 pt-4">
-                <p>Data lapangan, haram untuk dimanipulasi</p>
+                <p>Auto-Calculation Engine</p>
                 <p class="mt-1">© 2026 WebGIS Teristris by 123230055</p>
             </div>
         </aside>
@@ -117,7 +125,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Lembar Kerja KKH & Perataan Bowditch Otomatis</h3>
-                            <p class="text-sm text-slate-500">Masukkan parameter awal, spesifikasi alat, serta sudut terukur (β) dan jarak.</p>
+                            <p class="text-sm text-slate-500">Masukkan parameter awal, spesifikasi alat, serta sudut terukur (beta) dan jarak.</p>
                         </div>
                         <button onclick="downloadTemplate('kkh')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
@@ -125,7 +133,6 @@
                         </button>
                     </div>
 
-                    <!-- Parameter Awal BM & Spesifikasi Toleransi Alat -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X</label>
@@ -136,7 +143,7 @@
                             <input type="number" id="kkhY0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal α1 (°)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal alpha1 (°)</label>
                             <input type="number" id="kkhAz0" value="201.703" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
@@ -149,7 +156,6 @@
                         </div>
                     </div>
 
-                    <!-- Input Data Mentah KKH -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <div class="flex justify-between items-center">
                             <h4 class="font-bold text-slate-700 text-sm"><i class="fas fa-keyboard mr-2 text-blue-600"></i>Input Data Lapangan KKH (Sudut & Jarak)</h4>
@@ -163,7 +169,7 @@
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-700 font-semibold">
                                         <th>Titik</th>
-                                        <th>Sudut Terukur (β)</th>
+                                        <th>Sudut Terukur (beta)</th>
                                         <th>Jarak (m)</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -206,7 +212,6 @@
                         </div>
                     </div>
 
-                    <!-- Hasil Lembar Kerja KKH (Matriks Lengkap) -->
                     <div id="resultCardKKH" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                         <h4 class="font-bold text-slate-800 text-base"><i class="fas fa-table mr-2 text-emerald-600"></i>Hasil Matriks Perhitungan KKH & Perataan Bowditch</h4>
                         
@@ -215,17 +220,17 @@
                                 <thead>
                                     <tr class="bg-amber-100 text-slate-800 font-bold">
                                         <th>Titik</th>
-                                        <th>Sudut Terukur (β)</th>
+                                        <th>Sudut Terukur (beta)</th>
                                         <th>Koreksi</th>
                                         <th>Sudut Terkoreksi</th>
                                         <th>Jarak (D)</th>
-                                        <th>Azimuth (α)</th>
-                                        <th>D.sin(α)</th>
-                                        <th>D.cos(α)</th>
-                                        <th>Koreksi ΔX</th>
-                                        <th>Koreksi ΔY</th>
-                                        <th>ΔX Terkoreksi</th>
-                                        <th>ΔY Terkoreksi</th>
+                                        <th>Azimuth (alpha)</th>
+                                        <th>D.sin(alpha)</th>
+                                        <th>D.cos(alpha)</th>
+                                        <th>Koreksi Delta X</th>
+                                        <th>Koreksi Delta Y</th>
+                                        <th>Delta X Terkoreksi</th>
+                                        <th>Delta Y Terkoreksi</th>
                                         <th>X (Easting)</th>
                                         <th>Y (Northing)</th>
                                     </tr>
@@ -234,7 +239,6 @@
                             </table>
                         </div>
 
-                        <!-- Kotak Ringkasan Kesalahan Penutup Sudut & Toleransi (Persis Seperti Kolom R Excel) -->
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4">
                             <div class="lg:col-span-6 bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm">
                                 <div class="bg-amber-200 text-slate-800 font-bold px-4 py-2.5 text-sm border-b border-slate-300 flex items-center justify-between">
@@ -242,13 +246,10 @@
                                     <i class="fas fa-clipboard-check"></i>
                                 </div>
                                 <table class="w-full text-sm">
-                                    <tbody id="excelSummaryBox" class="divide-y divide-slate-200">
-                                        <!-- Akan diisi otomatis oleh JavaScript -->
-                                    </tbody>
+                                    <tbody id="excelSummaryBox" class="divide-y divide-slate-200"></tbody>
                                 </table>
                             </div>
 
-                            <!-- Peta Leaflet KKH -->
                             <div class="lg:col-span-6 bg-white p-2 rounded-xl border border-slate-200 flex flex-col h-[320px]">
                                 <h5 class="font-bold text-slate-700 text-xs mb-2">Visualisasi Poligon 2D</h5>
                                 <div id="mapKKH" class="w-full flex-1 rounded-lg z-0"></div>
@@ -262,7 +263,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Lembar Kerja KKV Waterpass (Beda Tinggi Pergi-Pulang)</h3>
-                            <p class="text-sm text-slate-500">Masukkan Δh pergi, Δh pulang, dan jarak per seksi. Elevasi dan koreksi dihitung otomatis.</p>
+                            <p class="text-sm text-slate-500">Masukkan Delta h pergi, Delta h pulang, dan jarak per seksi. Elevasi dan koreksi dihitung otomatis.</p>
                         </div>
                         <button onclick="downloadTemplate('waterpass')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
@@ -270,7 +271,6 @@
                         </button>
                     </div>
 
-                    <!-- Parameter Elevasi Awal BM -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Elevasi Awal BM (H1) (m)</label>
@@ -278,7 +278,6 @@
                         </div>
                     </div>
 
-                    <!-- Input Tabel Waterpass -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <div class="flex justify-between items-center">
                             <h4 class="font-bold text-slate-700 text-sm"><i class="fas fa-keyboard mr-2 text-blue-600"></i>Input Data Waterpass</h4>
@@ -292,8 +291,8 @@
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-700 font-semibold">
                                         <th>Titik / Seksi</th>
-                                        <th>Δh Pergi (mm)</th>
-                                        <th>Δh Pulang (mm)</th>
+                                        <th>Delta h Pergi (mm)</th>
+                                        <th>Delta h Pulang (mm)</th>
                                         <th>Jarak (D) (m)</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -340,7 +339,6 @@
                         </div>
                     </div>
 
-                    <!-- Hasil Tabel Waterpass -->
                     <div id="resultCardWP" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <h4 class="font-bold text-slate-800 text-base"><i class="fas fa-table mr-2 text-emerald-600"></i>Hasil Lembar Kerja KKV Waterpass</h4>
                         <div class="overflow-x-auto">
@@ -348,9 +346,9 @@
                                 <thead>
                                     <tr class="bg-emerald-100 text-slate-800 font-bold">
                                         <th>Titik</th>
-                                        <th>Δh Pergi (mm)</th>
-                                        <th>Δh Pulang (mm)</th>
-                                        <th>Δh Rata-rata (mm)</th>
+                                        <th>Delta h Pergi (mm)</th>
+                                        <th>Delta h Pulang (mm)</th>
+                                        <th>Delta h Rata-rata (mm)</th>
                                         <th>Jarak (D) (m)</th>
                                         <th>Koreksi</th>
                                         <th>Elevasi H (m)</th>
@@ -363,7 +361,111 @@
                     </div>
                 </section>
 
-                <!-- ================= TAB AUDIT & ANOMALI ================= -->
+                <!-- ================= TAB PERHITUNGAN DETAIL (TACHEOMETRY SHEET STYLE) ================= -->
+                <section id="tab-detail" class="tab-content space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Lembar Perhitungan Detail Situasi (Tacheometry)</h3>
+                            <p class="text-sm text-slate-500">Input sudut (Deg, Min, Sec), BA, BT, BB, dan tinggi alat. Sistem otomatis mendeteksi salah azimut & titik geser.</p>
+                        </div>
+                    </div>
+
+                    <!-- Input Tabel Detail Situasi -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-700 text-sm"><i class="fas fa-keyboard mr-2 text-blue-600"></i>Tabel Input Data Lapangan Detail</h4>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full eng-table bg-white">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 font-semibold text-xs">
+                                        <th>Stasiun</th>
+                                        <th>No Titik Detail</th>
+                                        <th>Tinggi Alat (m)</th>
+                                        <th>BA</th>
+                                        <th>BT</th>
+                                        <th>BB</th>
+                                        <th>Deg</th>
+                                        <th>Min</th>
+                                        <th>Sec</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-input-detail">
+                                    <tr>
+                                        <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
+                                        <td><input type="text" value="Taman 1" class="w-24 border rounded text-center bg-slate-50"></td>
+                                        <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.314" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.3" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.286" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" value="221" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="3" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="55" class="w-16 border rounded text-center"></td>
+                                        <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
+                                        <td><input type="text" value="Taman 2" class="w-24 border rounded text-center bg-slate-50"></td>
+                                        <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.325" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.3" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="1.275" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" value="101" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="3" class="w-16 border rounded text-center"></td>
+                                        <td><span class="text-rose-500 font-bold">450</span><input type="number" value="450" class="w-16 border rounded text-center hidden"></td> <!-- Sengaja diset salah detik (>60) untuk simulasi salah azimut -->
+                                        <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="addInputRowDetail()" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                                <i class="fas fa-plus"></i><span>Tambah Baris Detail</span>
+                            </button>
+                            <button onclick="prosesDetailSheet()" class="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition flex items-center space-x-2 shadow-sm">
+                                <i class="fas fa-calculator"></i><span>Proses & Deteksi Pergeseran Detail</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hasil Tabel Perhitungan Detail & Audit Anomali -->
+                    <div id="resultCardDetail" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                        <h4 class="font-bold text-slate-800 text-base"><i class="fas fa-table mr-2 text-emerald-600"></i>Hasil Matriks Perhitungan Detail & Deteksi Titik Bergeser</h4>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full eng-table text-xs">
+                                <thead>
+                                    <tr class="bg-amber-100 text-slate-800 font-bold">
+                                        <th>Stasiun</th>
+                                        <th>No Titik Detail</th>
+                                        <th>Jarak (D)</th>
+                                        <th>Sudut (Deg.Min.Sec)</th>
+                                        <th>Azimuth</th>
+                                        <th>Delta X</th>
+                                        <th>Delta Y</th>
+                                        <th>Earthing (X)</th>
+                                        <th>Northing (Y)</th>
+                                        <th>Audit Status (Pergeseran / Azimuth)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-hasil-detail"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4">
+                            <div id="auditDetailReport" class="lg:col-span-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-sm">
+                                <!-- Laporan Audit Detail & Solusi -->
+                            </div>
+                            <div class="lg:col-span-6 bg-white p-2 rounded-xl border border-slate-200 flex flex-col h-[320px]">
+                                <h5 class="font-bold text-slate-700 text-xs mb-2">Visualisasi Peta Titik Detail & Indikator Pergeseran</h5>
+                                <div id="mapDetail" class="w-full flex-1 rounded-lg z-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= TAB AUDIT & ANOMALI POLIGON ================= -->
                 <section id="tab-audit" class="tab-content space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                         <div>
@@ -373,7 +475,7 @@
                         
                         <div id="auditReportContainer" class="space-y-6">
                             <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 italic text-sm">
-                                <i class="fas fa-info-circle mr-1"></i> Belum ada data perhitungan yang diproses. Silakan lakukan perhitungan di tab <b>Hitungan KKH (Theodolite)</b> terlebih dahulu.
+                                <i class="fas fa-info-circle mr-1"></i> Belum ada data perhitungan poligon yang diproses. Silakan lakukan perhitungan di tab <b>Hitungan KKH (Theodolite)</b> terlebih dahulu.
                             </div>
                         </div>
                     </div>
@@ -390,7 +492,12 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(mapKKH);
         let polyLayerKKH = null;
 
+        let mapDetail = L.map('mapDetail').setView([-5.3971, 105.2668], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(mapDetail);
+        let detailLayerGroup = null;
+
         let lastAuditData = null;
+        let globalKKHCoordinates = {}; 
 
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
@@ -401,7 +508,10 @@
             sidebar.classList.toggle('closed');
             mainContent.classList.toggle('md:ml-72');
             mainContent.classList.toggle('md:ml-0');
-            setTimeout(() => { mapKKH.invalidateSize(); }, 300);
+            setTimeout(() => { 
+                mapKKH.invalidateSize(); 
+                mapDetail.invalidateSize();
+            }, 300);
         }
         sidebarToggle.addEventListener('click', toggleSidebar);
         sidebarClose.addEventListener('click', toggleSidebar);
@@ -421,11 +531,13 @@
             const titles = {
                 'kkh': 'Hitungan Kerangka Kontrol Horizontal (KKH)',
                 'kkv': 'Hitungan Kerangka Kontrol Vertikal (KKV Waterpass)',
-                'audit': 'Audit & Deteksi Anomali Data'
+                'detail': 'Lembar Perhitungan Detail Situasi (Tacheometry)',
+                'audit': 'Audit & Anomali Poligon'
             };
             document.getElementById('pageTitle').innerText = titles[tabId];
 
             if(tabId === 'kkh') { setTimeout(() => { mapKKH.invalidateSize(); }, 200); }
+            if(tabId === 'detail') { setTimeout(() => { mapDetail.invalidateSize(); }, 200); }
             if(tabId === 'audit') { renderAuditDashboard(); }
             if(window.innerWidth < 768 && !sidebar.classList.contains('closed')) { toggleSidebar(); }
         }
@@ -456,6 +568,25 @@
             tbody.appendChild(tr);
         }
 
+        function addInputRowDetail() {
+            const tbody = document.getElementById('tbody-input-detail');
+            const r = tbody.rows.length + 1;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
+                <td><input type="text" value="Detail ${r}" class="w-24 border rounded text-center bg-slate-50"></td>
+                <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="1.300" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="1.250" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="1.200" class="w-20 border rounded text-center"></td>
+                <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
         function prosesKKH() {
             const rows = document.querySelectorAll('#tbody-input-kkh tr');
             if(rows.length === 0) { alert('Masukkan data lapangan terlebih dahulu.'); return; }
@@ -478,11 +609,10 @@
 
             let n = rawData.length;
             let sumBeta = rawData.reduce((acc, cur) => acc + cur.beta, 0);
-            let syaratBeta = 360; // Total syarat poligon tertutup
+            let syaratBeta = 360; 
             let fb = sumBeta - syaratBeta; 
             let koreksiSudutPerTitik = -fb / n;
 
-            // Hitung toleransi sudut alat: Toleransi = m * sqrt(n) (dalam detik, lalu dikonversi ke derajat)
             let toleransiDetik = ketelitianAlatDetik * Math.sqrt(n);
             let toleransiDeg = toleransiDetik / 3600;
             let fbDetik = Math.abs(fb) * 3600;
@@ -520,8 +650,11 @@
             let currY = y0;
             let finalResults = [];
 
+            let basePointName = processed[processed.length-1].titik === 'P1' ? 'P1' : 'BM';
+            globalKKHCoordinates[basePointName] = { x: currX, y: currY };
+
             finalResults.push({
-                titik: processed[processed.length-1].titik === 'P1' ? 'P1' : 'BM',
+                titik: basePointName,
                 beta: '-', koreksi: '-', betaTerkoreksi: '-', jarak: '-', azimuth: '-', dSin: '-', dCos: '-',
                 korDX: '-', korDY: '-', dX_terkoreksi: '-', dY_terkoreksi: '-', x: currX, y: currY
             });
@@ -536,6 +669,8 @@
 
                 currX += dX_terkoreksi;
                 currY += dY_terkoreksi;
+
+                globalKKHCoordinates[item.titik] = { x: currX, y: currY };
 
                 let korMagnitude = Math.sqrt(korDX*korDX + korDY*korDY);
 
@@ -614,13 +749,12 @@
                 pointAudits
             };
 
-            // Render kotak ringkasan persis gaya Excel di Kolom R
             const summaryBox = document.getElementById('excelSummaryBox');
             summaryBox.innerHTML = `
-                <tr><td class="p-2 text-left font-medium bg-slate-50">Σ β</td><td class="p-2 text-right font-mono">${sumBeta.toFixed(3)}°</td></tr>
-                <tr><td class="p-2 text-left font-medium bg-slate-50">Σ Syarat</td><td class="p-2 text-right font-mono">${syaratBeta.toFixed(3)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Sigma beta</td><td class="p-2 text-right font-mono">${sumBeta.toFixed(3)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Sigma Syarat</td><td class="p-2 text-right font-mono">${syaratBeta.toFixed(3)}°</td></tr>
                 <tr><td class="p-2 text-left font-medium bg-slate-50">Toleransi Alat (${ketelitianAlatDetik}'')</td><td class="p-2 text-right font-mono">${toleransiDeg.toFixed(6)}° (${toleransiDetik.toFixed(1)}')</td></tr>
-                <tr><td class="p-2 text-left font-medium bg-slate-50">fβ (Error Sudut)</td><td class="p-2 text-right font-mono ${isSudutLolos ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${fb.toFixed(6)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">fbeta (Error Sudut)</td><td class="p-2 text-right font-mono ${isSudutLolos ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${fb.toFixed(6)}°</td></tr>
                 <tr><td class="p-2 text-left font-medium bg-slate-50">fl (Linear Misclosure)</td><td class="p-2 text-right font-mono">${linearMisclosure.toFixed(5)} m (1:${ketelitianAktual})</td></tr>
                 <tr><td class="p-2 text-left font-medium bg-slate-50">Absis (Fx)</td><td class="p-2 text-right font-mono">${sumDX.toFixed(5)}</td></tr>
                 <tr><td class="p-2 text-left font-medium bg-slate-50">Ordinat (Fy)</td><td class="p-2 text-right font-mono">${sumDY.toFixed(5)}</td></tr>
@@ -630,12 +764,156 @@
             renderMapKKH(finalResults);
         }
 
+        // --- PROSES PERHITUNGAN DETAIL TACHEOMETRY & AUDIT ANOMALI (SALAH AZIMUT & GESER) ---
+        function prosesDetailSheet() {
+            const rows = document.querySelectorAll('#tbody-input-detail tr');
+            if(rows.length === 0) { alert('Masukkan data titik detail terlebih dahulu.'); return; }
+
+            let rawDetails = [];
+            rows.forEach(tr => {
+                const inp = tr.querySelectorAll('input');
+                let stasiun = inp[0].value.trim();
+                let namaTitik = inp[1].value.trim();
+                let tAlat = Number(inp[2].value);
+                let ba = Number(inp[3].value);
+                let bt = Number(inp[4].value);
+                let bb = Number(inp[5].value);
+                let deg = Number(inp[6].value);
+                let min = Number(inp[7].value);
+                let sec = Number(inp[8].value);
+
+                rawDetails.push({ stasiun, namaTitik, tAlat, ba, bt, bb, deg, min, sec });
+            });
+
+            let calculatedDetails = [];
+            let totalJarak = 0;
+
+            // Hitung Jarak dan Azimuth sementara untuk cek rata-rata jarak (Deteksi Outlier / Geser)
+            let tempDistances = rawDetails.map(d => {
+                let dist = (d.ba - d.bb) * 100;
+                return dist > 0 ? dist : 0;
+            });
+            let avgDist = tempDistances.reduce((a, b) => a + b, 0) / (tempDistances.length || 1);
+
+            rawDetails.forEach((d, idx) => {
+                let jarak = (d.ba - d.bb) * 100;
+                let decimalAngle = d.deg + (d.min / 60) + (d.sec / 3600);
+                
+                let statusAnomali = "Normal";
+                let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
+
+                // Deteksi Error 1: Salah Azimut (Menit/Detik >= 60 atau Sudut negatif / >= 360)
+                if (d.min >= 60 || d.sec >= 60 || d.deg < 0 || decimalAngle >= 360) {
+                    statusAnomali = "Salah Azimut (Format Menit/Detik > 60)";
+                    badgeClass = "bg-rose-100 text-rose-800 border-rose-300";
+                } 
+                // Deteksi Error 2: Jarak negatif / nol (BA <= BB)
+                else if (jarak <= 0) {
+                    statusAnomali = "Kesalahan Bacaan Rambu (BA <= BB)";
+                    badgeClass = "bg-rose-100 text-rose-800 border-rose-300";
+                }
+                // Deteksi Error 3: Titik Bergeser / Mental (Outlier jarak terlalu jauh dari rata-rata atau > 200m untuk tacheometry optis)
+                else if (jarak > 200 || (jarak > avgDist * 3 && jarak > 80)) {
+                    statusAnomali = "Titik Bergeser (Outlier Jarak Ekstrem)";
+                    badgeClass = "bg-amber-100 text-amber-800 border-amber-300";
+                }
+
+                let stX = 0, stY = 0;
+                if(globalKKHCoordinates[d.stasiun]) {
+                    stX = globalKKHCoordinates[d.stasiun].x;
+                    stY = globalKKHCoordinates[d.stasiun].y;
+                }
+
+                let rad = decimalAngle * (Math.PI / 180);
+                let deltaX = jarak * Math.sin(rad);
+                let deltaY = jarak * Math.cos(rad);
+                let finalX = stX + deltaX;
+                let finalY = stY + deltaY;
+
+                calculatedDetails.push({
+                    ...d,
+                    jarak,
+                    decimalAngle,
+                    deltaX,
+                    deltaY,
+                    finalX,
+                    finalY,
+                    statusAnomali,
+                    badgeClass
+                });
+            });
+
+            const tbody = document.getElementById('tbody-hasil-detail');
+            tbody.innerHTML = '';
+            calculatedDetails.forEach(row => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="font-bold bg-slate-50">${row.stasiun}</td>
+                        <td class="font-semibold">${row.namaTitik}</td>
+                        <td>${row.jarak.toFixed(3)} m</td>
+                        <td>${row.deg}° ${row.min}' ${row.sec}"</td>
+                        <td>${row.decimalAngle.toFixed(3)}°</td>
+                        <td>${row.deltaX.toFixed(3)}</td>
+                        <td>${row.deltaY.toFixed(3)}</td>
+                        <td class="font-semibold">${row.finalX.toFixed(3)}</td>
+                        <td class="font-semibold">${row.finalY.toFixed(3)}</td>
+                        <td><span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${row.badgeClass}">${row.statusAnomali}</span></td>
+                    </tr>
+                `;
+            });
+
+            let totalAnomali = calculatedDetails.filter(d => d.statusAnomali !== "Normal").length;
+            let auditBox = document.getElementById('auditDetailReport');
+            auditBox.innerHTML = `
+                <h5 class="font-bold text-slate-700 border-b pb-1">Laporan Audit & Solusi Titik Detail</h5>
+                <p><b>Total Titik Detail:</b> ${calculatedDetails.length} titik</p>
+                <p><b>Titik Terdeteksi Bermasalah/Bergeser:</b> <span class="${totalAnomali > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'}">${totalAnomali} titik</span></p>
+                <div class="mt-2 p-3 bg-white rounded-lg border text-xs space-y-1">
+                    <p class="font-semibold text-slate-700">Panduan Perbaikan Lapangan:</p>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                        <li><b>Salah Azimut:</b> Pastikan penulisan menit (') dan detik ('') berada dalam rentang 0 sampai 59. Jika lebih, lakukan konversi derajat dengan benar.</li>
+                        <li><b>Titik Bergeser (Outlier):</b> Periksa kembali apakah pembacaan benang atas (BA) dan benang bawah (BB) tertukar atau salah catat di buku ukur, sehingga menyebabkan jarak horizontal terhitung terlalu besar.</li>
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('resultCardDetail').classList.remove('hidden');
+            renderMapDetail(calculatedDetails);
+        }
+
+        function renderMapDetail(details) {
+            if(detailLayerGroup) mapDetail.removeLayer(detailLayerGroup);
+            detailLayerGroup = L.layerGroup();
+            let allLatLngs = [];
+
+            details.forEach(d => {
+                let stCoord = globalKKHCoordinates[d.stasiun] || { x: 0, y: 0 };
+                let stLatLng = [-5.3971 + (stCoord.y * 0.00001), 105.2668 + (stCoord.x * 0.00001)];
+                let detLatLng = [-5.3971 + (d.finalY * 0.00001), 105.2668 + (d.finalX * 0.00001)];
+
+                allLatLngs.push(detLatLng);
+
+                let lineColor = d.statusAnomali === "Normal" ? '#2563eb' : '#e11d48';
+                let line = L.polyline([stLatLng, detLatLng], {color: lineColor, weight: 2, dashArray: '4, 4'});
+                detailLayerGroup.addLayer(line);
+
+                let marker = L.circleMarker(detLatLng, {radius: 6, color: '#1e293b', fillColor: d.statusAnomali === "Normal" ? '#3b82f6' : '#f43f5e', fillOpacity: 1});
+                marker.bindPopup(`<b>Detail:</b> ${d.namaTitik}<br><b>Stasiun:</b> ${d.stasiun}<br><b>Status:</b> ${d.statusAnomali}<br><b>X:</b> ${d.finalX.toFixed(3)} | <b>Y:</b> ${d.finalY.toFixed(3)}`);
+                detailLayerGroup.addLayer(marker);
+            });
+
+            detailLayerGroup.addTo(mapDetail);
+            if(allLatLngs.length > 0) {
+                mapDetail.fitBounds(L.latLngBounds(allLatLngs), {padding: [50, 50]});
+            }
+        }
+
         function renderAuditDashboard() {
             const container = document.getElementById('auditReportContainer');
             if(!lastAuditData) {
                 container.innerHTML = `
                     <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 italic text-sm">
-                        <i class="fas fa-info-circle mr-1"></i> Belum ada data perhitungan yang diproses. Silakan lakukan perhitungan di tab <b>Hitungan KKH (Theodolite)</b> terlebih dahulu.
+                        <i class="fas fa-info-circle mr-1"></i> Belum ada data perhitungan poligon yang diproses. Silakan lakukan perhitungan di tab <b>Hitungan KKH (Theodolite)</b> terlebih dahulu.
                     </div>
                 `;
                 return;
@@ -666,7 +944,7 @@
                         <div class="text-2xl font-bold text-slate-800 mt-1">${d.n} Titik</div>
                     </div>
                     <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Status Sudut (fβ vs Toleransi)</span>
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Status Sudut (fbeta vs Toleransi)</span>
                         <div class="text-lg font-bold ${d.isSudutLolos ? 'text-emerald-600' : 'text-rose-600'} mt-1">${d.isSudutLolos ? 'Lolos Toleransi Alat' : 'Melebihi Toleransi'}</div>
                     </div>
                     <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
@@ -689,7 +967,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-7 bg-white p-5 border border-slate-200 rounded-xl space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm"><i class="fas fa-list-ol mr-2 text-blue-600"></i>Peringkat Akumulasi Koreksi Per Titik</h4>
+                        <h4 class="font-bold text-slate-800 text-sm"><i class="fas fa-list-ol mr-2 text-blue-600"></i>Peringkat Akumulasi Koreksi Per Titik Poligon</h4>
                         <div class="overflow-x-auto border rounded-xl">
                             <table class="w-full text-left text-sm">
                                 <thead class="bg-slate-100 text-slate-600 border-b">
@@ -714,11 +992,11 @@
                                 <p><b>Titik Paling Kritis: <span class="text-rose-600 font-bold">${topProblemPoint.titik}</span></b></p>
                                 <p>Titik ini menyerap nilai koreksi Bowditch terbesar sebesar <b>${topProblemPoint.korMagnitude.toFixed(4)} meter</b>.</p>
                                 <hr class="border-amber-200 my-1">
-                                <p class="font-semibold text-slate-800 mt-2"> Saran Tindakan Perbaikan:</p>
+                                <p class="font-semibold text-slate-800 mt-2">Saran Tindakan Perbaikan:</p>
                                 <ul class="list-disc pl-4 space-y-1 text-slate-700">
                                     <li>Periksa kembali catatan buku ukur pada seksi menuju titik <b>${topProblemPoint.titik}</b>.</li>
                                     <li>Validasi pembacaan sudut horizontal atau pembacaan benang rambu (BA/BB).</li>
-                                    <li>Lakukan <b>pengukuran ulang (re-survey)</b> khusus pada titik tersebut jika melampaui batas toleransi spesifikasi alat.</li>
+                                    <li>Lakukan pengukuran ulang (re-survey) khusus pada titik tersebut jika melampaui batas toleransi spesifikasi alat.</li>
                                 </ul>
                             </div>
                         </div>
@@ -809,7 +1087,7 @@
             });
 
             document.getElementById('detailErrorWP').innerHTML = `
-                <p><b>Σ Δh Pergi:</b> ${sumPergi.toFixed(3)} mm | <b>Σ Δh Pulang:</b> ${sumPulang.toFixed(3)} mm</p>
+                <p><b>Sigma Delta h Pergi:</b> ${sumPergi.toFixed(3)} mm | <b>Sigma Delta h Pulang:</b> ${sumPulang.toFixed(3)} mm</p>
                 <p><b>Kesalahan Tinggi (Fh):</b> ${fh.toFixed(3)} mm | <b>Total Jarak:</b> ${totalJarak.toFixed(3)} m</p>
                 <p class="text-emerald-600 font-bold mt-1"><i class="fas fa-check-circle mr-1"></i> Perhitungan KKV Waterpass Berhasil Diselesaikan!</p>
             `;
