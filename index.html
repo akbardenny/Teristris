@@ -17,8 +17,12 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        /* Kelas untuk menutup sidebar secara penuh di desktop maupun HP */
-        #sidebar.is-closed {
+        
+        /* Pengaturan Sidebar & Transisi yang Mulus */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        #sidebar.closed {
             transform: translateX(-100%) !important;
         }
     </style>
@@ -28,7 +32,7 @@
     <div class="flex h-screen overflow-hidden relative">
         
         <!-- SIDEBAR NAVIGASI BERDASARKAN ALAT -->
-        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 absolute inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-300 ease-in-out z-50 flex flex-col justify-between shadow-xl">
+        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 fixed md:relative inset-y-0 left-0 z-50 flex flex-col justify-between shadow-2xl">
             <div>
                 <!-- Brand Logo -->
                 <div class="flex items-center justify-between px-2 mb-8">
@@ -41,7 +45,8 @@
                             <span class="text-xs text-slate-400">Modul Pengolahan Alat</span>
                         </div>
                     </div>
-                    <button id="sidebarClose" class="md:hidden text-slate-400 hover:text-white">
+                    <!-- Tombol Close Sidebar -->
+                    <button id="sidebarClose" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
                         <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
@@ -94,7 +99,8 @@
             <!-- Top Navbar -->
             <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-10 shadow-sm">
                 <div class="flex items-center space-x-4">
-                    <button id="sidebarToggle" class="text-slate-600 hover:text-slate-900 focus:outline-none bg-slate-100 p-2 rounded-lg transition">
+                    <!-- Tombol Toggle Sidebar (Buka/Tutup di Laptop & HP) -->
+                    <button id="sidebarToggle" class="text-slate-600 hover:text-slate-900 focus:outline-none bg-slate-100 hover:bg-slate-200 p-2 rounded-lg transition">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
                     <h2 id="pageTitle" class="text-lg font-bold text-slate-800">Pengolahan KKH & KKV (Theodolite)</h2>
@@ -164,7 +170,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-theodolite" class="divide-y divide-slate-100">
-                                        <!-- Tabel dimulai kosong sesuai permintaan -->
+                                        <!-- Dimulai kosong dengan panduan input -->
                                     </tbody>
                                 </table>
                             </div>
@@ -241,7 +247,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-ts" class="divide-y divide-slate-100">
-                                        <!-- Tabel dimulai kosong -->
+                                        <!-- Dimulai kosong -->
                                     </tbody>
                                 </table>
                             </div>
@@ -300,7 +306,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-waterpass" class="divide-y divide-slate-100">
-                                    <!-- Tabel dimulai kosong -->
+                                    <!-- Dimulai kosong -->
                                 </tbody>
                             </table>
                         </div>
@@ -347,16 +353,16 @@
         let polyTheoLayer = null;
         let polyTSLayer = null;
 
-        // Sidebar Toggle Universal (Bisa ditutup/dibuka di HP maupun Laptop)
+        // Kontrol Toggle Sidebar (Buka/Tutup Sempurna)
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
 
         sidebarToggle.addEventListener('click', () => { 
-            sidebar.classList.toggle('is-closed'); 
+            sidebar.classList.toggle('closed'); 
         });
         sidebarClose.addEventListener('click', () => { 
-            sidebar.classList.add('is-closed'); 
+            sidebar.classList.add('closed'); 
         });
 
         // Tab Switcher
@@ -386,10 +392,11 @@
                 if(tabId === 'totalstation') mapTS.invalidateSize();
             }, 200);
 
-            if(window.innerWidth < 768) { sidebar.classList.add('is-closed'); }
+            // Otomatis tutup sidebar di HP saat menu diklik
+            if(window.innerWidth < 768) { sidebar.classList.add('closed'); }
         }
 
-        // --- TAMBAH BARIS TABEL DENGAN PLACEHOLDER "Input..." ---
+        // --- TAMBAH BARIS KOSONG DENGAN PANDUAN INPUT ---
         function addRowTheodolite() {
             const tbody = document.getElementById('tbody-theodolite');
             const tr = document.createElement('tr');
