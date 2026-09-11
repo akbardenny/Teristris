@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS Teristris - Multi Alat Ukur Pro</title>
+    <title>WebGIS Teristris - Pengolahan Otomatis</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -18,12 +18,22 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Pengaturan Sidebar & Transisi yang Mulus */
+        /* Transisi Sidebar Fixed Melayang */
         #sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 18rem; /* 288px */
+            z-index: 50;
             transition: transform 0.3s ease-in-out;
         }
         #sidebar.closed {
-            transform: translateX(-100%) !important;
+            transform: translateX(-100%);
+        }
+        /* Transisi Konten Utama */
+        #mainContent {
+            transition: margin-left 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -32,7 +42,7 @@
     <div class="flex h-screen overflow-hidden relative">
         
         <!-- SIDEBAR NAVIGASI BERDASARKAN ALAT -->
-        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 fixed md:relative inset-y-0 left-0 z-50 flex flex-col justify-between shadow-2xl">
+        <aside id="sidebar" class="bg-slate-900 text-slate-300 py-6 px-4 flex flex-col justify-between shadow-2xl">
             <div>
                 <!-- Brand Logo -->
                 <div class="flex items-center justify-between px-2 mb-8">
@@ -89,17 +99,17 @@
             <!-- Footer Sidebar -->
             <div class="px-2 text-xs text-slate-500 border-t border-slate-800 pt-4">
                 <p>Multi-Instrument Engine</p>
-                <p class="mt-1">© 2026 WebGIS Teristris</p>
+                <p class="mt-1">© 2026 WebGIS Teristris by 123230055</p>
             </div>
         </aside>
 
-        <!-- KONTEN UTAMA -->
-        <div class="flex-1 flex flex-col overflow-hidden w-full">
+        <!-- KONTEN UTAMA (Otomatis menyesuaikan margin saat sidebar ditutup) -->
+        <div id="mainContent" class="flex-1 flex flex-col overflow-hidden w-full md:ml-72">
             
             <!-- Top Navbar -->
             <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-10 shadow-sm">
                 <div class="flex items-center space-x-4">
-                    <!-- Tombol Toggle Sidebar (Buka/Tutup di Laptop & HP) -->
+                    <!-- Tombol Toggle Sidebar -->
                     <button id="sidebarToggle" class="text-slate-600 hover:text-slate-900 focus:outline-none bg-slate-100 hover:bg-slate-200 p-2 rounded-lg transition">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
@@ -170,7 +180,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-theodolite" class="divide-y divide-slate-100">
-                                        <!-- Dimulai kosong dengan panduan input -->
+                                        <!-- Dimulai kosong sesuai permintaan -->
                                     </tbody>
                                 </table>
                             </div>
@@ -353,17 +363,26 @@
         let polyTheoLayer = null;
         let polyTSLayer = null;
 
-        // Kontrol Toggle Sidebar (Buka/Tutup Sempurna)
+        // Kontrol Toggle Sidebar & Perluasan Konten Utama Tanpa Gap
         const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
 
-        sidebarToggle.addEventListener('click', () => { 
-            sidebar.classList.toggle('closed'); 
-        });
-        sidebarClose.addEventListener('click', () => { 
-            sidebar.classList.add('closed'); 
-        });
+        function toggleSidebar() {
+            sidebar.classList.toggle('closed');
+            mainContent.classList.toggle('md:ml-72');
+            mainContent.classList.toggle('md:ml-0');
+
+            // Refresh ukuran peta agar tidak abu-abu setelah transisi
+            setTimeout(() => {
+                mapTheodolite.invalidateSize();
+                mapTS.invalidateSize();
+            }, 300);
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarClose.addEventListener('click', toggleSidebar);
 
         // Tab Switcher
         function switchTab(tabId) {
@@ -392,8 +411,10 @@
                 if(tabId === 'totalstation') mapTS.invalidateSize();
             }, 200);
 
-            // Otomatis tutup sidebar di HP saat menu diklik
-            if(window.innerWidth < 768) { sidebar.classList.add('closed'); }
+            // Jika di HP, tutup sidebar otomatis saat menu dipilih
+            if(window.innerWidth < 768 && !sidebar.classList.contains('closed')) {
+                toggleSidebar();
+            }
         }
 
         // --- TAMBAH BARIS KOSONG DENGAN PANDUAN INPUT ---
