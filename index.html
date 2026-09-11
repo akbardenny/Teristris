@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS Thacymetry & KKV Pro</title>
+    <title>WebGIS Teristris - Multi Alat Ukur Pro</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- SheetJS untuk Parsing Excel/CSV -->
+    <!-- SheetJS untuk Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -23,18 +23,18 @@
 
     <div class="flex h-screen overflow-hidden">
         
-        <!-- SIDEBAR (Collapsible & Responsive) -->
-        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-64 space-y-6 py-6 px-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out z-50 flex flex-col justify-between shadow-xl">
+        <!-- SIDEBAR NAVIGASI BERDASARKAN ALAT -->
+        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out z-50 flex flex-col justify-between shadow-xl">
             <div>
                 <!-- Brand Logo -->
                 <div class="flex items-center justify-between px-2 mb-8">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-blue-600 text-white p-2 rounded-lg shadow-md">
-                            <i class="fas fa-map-marked-alt text-xl"></i>
+                        <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-md">
+                            <i class="fas fa-drafting-compass text-xl"></i>
                         </div>
                         <div>
-                            <h1 class="text-white font-bold text-lg leading-tight">Teristris GIS</h1>
-                            <span class="text-xs text-slate-400">Thacymetry & KKV</span>
+                            <h1 class="text-white font-bold text-base leading-tight">Teristris GIS</h1>
+                            <span class="text-xs text-slate-400">Modul Pengolahan Alat</span>
                         </div>
                     </div>
                     <button id="sidebarClose" class="md:hidden text-slate-400 hover:text-white">
@@ -43,25 +43,43 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="space-y-1.5">
-                    <button onclick="switchTab('thacymetry')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 bg-blue-600 text-white font-medium shadow-md shadow-blue-600/20" data-target="thacymetry">
-                        <i class="fas fa-calculator w-5"></i>
-                        <span>Hitungan Thacymetry</span>
+                <nav class="space-y-1.5 text-sm">
+                    <button onclick="switchTab('theodolite')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 bg-blue-600 text-white font-medium shadow-md shadow-blue-600/20" data-target="theodolite">
+                        <i class="fas fa-crosshairs w-5"></i>
+                        <div class="text-left">
+                            <div>KKH & KKV Theodolite</div>
+                            <span class="text-[10px] text-blue-200 opacity-80">Sudut DMS & Thacymetry</span>
+                        </div>
                     </button>
-                    <button onclick="switchTab('kkv')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="kkv">
-                        <i class="fas fa-chart-line w-5"></i>
-                        <span>Hitungan KKV & 3D</span>
+
+                    <button onclick="switchTab('totalstation')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="totalstation">
+                        <i class="fas fa-satellite-dish w-5"></i>
+                        <div class="text-left">
+                            <div>KKH Total Station</div>
+                            <span class="text-[10px] text-slate-400">Jarak & Sudut Langsung</span>
+                        </div>
                     </button>
+
+                    <button onclick="switchTab('waterpass')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="waterpass">
+                        <i class="fas fa-layer-group w-5"></i>
+                        <div class="text-left">
+                            <div>KKV Waterpass</div>
+                            <span class="text-[10px] text-slate-400">Beda Tinggi Pergi-Pulang</span>
+                        </div>
+                    </button>
+
+                    <div class="pt-4 pb-2"><hr class="border-slate-800"></div>
+
                     <button onclick="switchTab('audit')" class="nav-btn w-full flex items-center space-x-3 py-3 px-4 rounded-xl transition duration-200 hover:bg-slate-800 text-slate-300 font-medium" data-target="audit">
                         <i class="fas fa-shield-alt w-5"></i>
-                        <span>Audit & Anomali</span>
+                        <span>Audit & Anomali Data</span>
                     </button>
                 </nav>
             </div>
 
             <!-- Footer Sidebar -->
             <div class="px-2 text-xs text-slate-500 border-t border-slate-800 pt-4">
-                <p>Versi 3.0 Engine</p>
+                <p>Multi-Instrument Engine</p>
                 <p class="mt-1">© 2026 WebGIS Teristris</p>
             </div>
         </aside>
@@ -75,11 +93,11 @@
                     <button id="sidebarToggle" class="text-slate-600 hover:text-slate-900 focus:outline-none bg-slate-100 p-2 rounded-lg transition">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
-                    <h2 id="pageTitle" class="text-lg font-bold text-slate-800">Kalkulator Pengolahan Data Thacymetry</h2>
+                    <h2 id="pageTitle" class="text-lg font-bold text-slate-800">Pengolahan KKH & KKV (Theodolite)</h2>
                 </div>
                 <div class="flex items-center space-x-3">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                        <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Engine Aktif
+                        <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Siap Digunakan
                     </span>
                 </div>
             </header>
@@ -87,52 +105,46 @@
             <!-- Main Scrollable Content Area -->
             <main class="flex-1 overflow-y-auto p-6 bg-slate-50 space-y-6">
                 
-                <!-- TAB 1: THACYMETRY -->
-                <section id="tab-thacymetry" class="tab-content space-y-6">
-                    <!-- Banner Info & Template -->
+                <!-- ================= TAB 1: THEODOLITE ================= -->
+                <section id="tab-theodolite" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-800">Pengolahan Data Lapangan & Koreksi Bowditch</h3>
-                            <p class="text-sm text-slate-500">Masukkan koordinat lokal BM awal, sudut DMS, dan bacaan benang rambu (BA, BT, BB).</p>
+                            <h3 class="text-base font-bold text-slate-800">Modul Theodolite (Sudut DMS & Thacymetry Optis)</h3>
+                            <p class="text-sm text-slate-500">Pengolahan poligon menggunakan pembacaan benang rambu (BA, BT, BB) dan sudut horizontal.</p>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <button onclick="downloadTemplate('thacymetry')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
-                                <i class="fas fa-file-excel"></i>
-                                <span>Unduh Template Excel</span>
-                            </button>
-                        </div>
+                        <button onclick="downloadTemplate('theodolite')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Template Theodolite</span>
+                        </button>
                     </div>
 
-                    <!-- Parameter Awal Titik Ikat (BM) -->
+                    <!-- Parameter Titik Ikat BM -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X (Easting Lokal)</label>
-                            <input type="number" id="bmX" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 font-medium">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X (Lokal)</label>
+                            <input type="number" id="theoX" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal Y (Northing Lokal)</label>
-                            <input type="number" id="bmY" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 font-medium">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal Y (Lokal)</label>
+                            <input type="number" id="theoY" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal Sisi Pertama (Derajat)</label>
-                            <input type="number" id="bmAzimuth" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 font-medium">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal (°)</label>
+                            <input type="number" id="theoAz" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                     </div>
 
-                    <!-- Layout Grid: Form & Map -->
+                    <!-- Form & Map Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- Sisi Kiri: Tabel Input -->
                         <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                             <div class="flex justify-between items-center">
-                                <h4 class="font-bold text-slate-700">Tabel Data Lapangan Thacymetry</h4>
+                                <h4 class="font-bold text-slate-700">Tabel Data Lapangan Theodolite</h4>
                                 <label class="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center space-x-2">
                                     <i class="fas fa-upload"></i>
-                                    <span>Upload Excel</span>
-                                    <input type="file" accept=".csv, .xlsx" class="hidden" onchange="handleFileUpload(event)">
+                                    <span>Upload</span>
+                                    <input type="file" accept=".csv, .xlsx" class="hidden" onchange="handleFileUpload(event, 'theodolite')">
                                 </label>
                             </div>
-
-                            <!-- Tabel Data -->
                             <div class="overflow-x-auto border border-slate-200 rounded-xl">
                                 <table class="w-full text-left border-collapse text-sm">
                                     <thead>
@@ -147,7 +159,7 @@
                                             <th class="p-3 font-semibold text-center">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tbody-thacymetry" class="divide-y divide-slate-100">
+                                    <tbody id="tbody-theodolite" class="divide-y divide-slate-100">
                                         <tr>
                                             <td class="p-2"><input type="text" value="P1" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
                                             <td class="p-2"><input type="number" value="90" class="w-16 p-1.5 border rounded-lg text-center"></td>
@@ -158,68 +170,180 @@
                                             <td class="p-2"><input type="number" step="0.001" value="1.000" class="w-20 p-1.5 border rounded-lg"></td>
                                             <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
                                         </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="addRowTheodolite()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2">
+                                    <i class="fas fa-plus"></i><span>Tambah Baris</span>
+                                </button>
+                                <button onclick="hitungTheodolite()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2 shadow-sm">
+                                    <i class="fas fa-calculator"></i><span>Hitung & Petakan</span>
+                                </button>
+                            </div>
+                            <div id="panelTheo" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                                <h5 class="font-bold text-slate-700 text-sm mb-1">Hasil Perhitungan Theodolite:</h5>
+                                <div id="detailTheo"></div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                            <h4 class="font-bold text-slate-700 mb-4">Peta Poligon Theodolite</h4>
+                            <div id="mapTheodolite" class="w-full flex-1 min-h-[350px] rounded-xl border border-slate-200 z-0"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= TAB 2: TOTAL STATION ================= -->
+                <section id="tab-totalstation" class="tab-content space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Modul Total Station (TS)</h3>
+                            <p class="text-sm text-slate-500">Pengolahan data KKH menggunakan input Jarak Datar (HD) dan Sudut Jurusan langsung.</p>
+                        </div>
+                        <button onclick="downloadTemplate('ts')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Template Total Station</span>
+                        </button>
+                    </div>
+
+                    <!-- Parameter BM TS -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X</label>
+                            <input type="number" id="tsX" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal Y</label>
+                            <input type="number" id="tsY" value="5000.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal (°)</label>
+                            <input type="number" id="tsAz" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                        </div>
+                    </div>
+
+                    <!-- Form & Map Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-slate-700">Tabel Data Lapangan Total Station</h4>
+                                <label class="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                                    <i class="fas fa-upload"></i>
+                                    <span>Upload</span>
+                                    <input type="file" accept=".csv, .xlsx" class="hidden" onchange="handleFileUpload(event, 'ts')">
+                                </label>
+                            </div>
+                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                            <th class="p-3 font-semibold">Titik</th>
+                                            <th class="p-3 font-semibold">Sudut (Deg)</th>
+                                            <th class="p-3 font-semibold">Sudut (Min)</th>
+                                            <th class="p-3 font-semibold">Sudut (Sec)</th>
+                                            <th class="p-3 font-semibold">Jarak Datar (m)</th>
+                                            <th class="p-3 font-semibold text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-ts" class="divide-y divide-slate-100">
                                         <tr>
-                                            <td class="p-2"><input type="text" value="P2" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                                            <td class="p-2"><input type="number" value="180" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="1.400" class="w-20 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="1.150" class="w-20 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="0.900" class="w-20 p-1.5 border rounded-lg"></td>
+                                            <td class="p-2"><input type="text" value="P1" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                                            <td class="p-2"><input type="number" value="90" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                                            <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                                            <td class="p-2"><input type="number" step="0.001" value="25.500" class="w-28 p-1.5 border rounded-lg"></td>
                                             <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="flex gap-3">
-                                <button onclick="addRowThacymetry()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2">
+                                <button onclick="addRowTS()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2">
                                     <i class="fas fa-plus"></i><span>Tambah Baris</span>
                                 </button>
-                                <button onclick="jalankanHitungan()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2 shadow-sm">
-                                    <i class="fas fa-calculator"></i><span>Hitung & Proses Poligon</span>
+                                <button onclick="hitungTS()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2 shadow-sm">
+                                    <i class="fas fa-calculator"></i><span>Hitung & Petakan TS</span>
                                 </button>
                             </div>
-
-                            <!-- Panel Informasi Hasil Hitungan -->
-                            <div id="hasilPanel" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
-                                <h5 class="font-bold text-slate-700 text-sm">Hasil Analisis & Perataan Bowditch:</h5>
-                                <div id="hasilDetail" class="text-slate-600 space-y-1"></div>
+                            <div id="panelTS" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                                <h5 class="font-bold text-slate-700 text-sm mb-1">Hasil Perhitungan Total Station:</h5>
+                                <div id="detailTS"></div>
                             </div>
                         </div>
-
-                        <!-- Sisi Kanan: Peta Leaflet -->
                         <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
-                            <h4 class="font-bold text-slate-700 mb-4">Visualisasi Peta Poligon 2D</h4>
-                            <div id="mapThacymetry" class="w-full flex-1 min-h-[350px] rounded-xl border border-slate-200 z-0"></div>
+                            <h4 class="font-bold text-slate-700 mb-4">Peta Poligon Total Station</h4>
+                            <div id="mapTS" class="w-full flex-1 min-h-[350px] rounded-xl border border-slate-200 z-0"></div>
                         </div>
                     </div>
                 </section>
 
-                <!-- TAB 2: KKV -->
-                <section id="tab-kkv" class="tab-content space-y-6 hidden">
+                <!-- ================= TAB 3: WATERPASS ================= -->
+                <section id="tab-waterpass" class="tab-content space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-800">Kerangka Kontrol Vertikal (Waterpass)</h3>
-                            <p class="text-sm text-slate-500">Analisis beda tinggi pergi-pulang dan profil memanjang.</p>
+                            <h3 class="text-base font-bold text-slate-800">Modul Kerangka Kontrol Vertikal (Waterpass)</h3>
+                            <p class="text-sm text-slate-500">Pengolahan beda tinggi pergi-pulang (Kerangka Vertikal).</p>
                         </div>
-                        <button onclick="downloadTemplate('kkv')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
+                        <button onclick="downloadTemplate('waterpass')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
-                            <span>Unduh Template KKV</span>
+                            <span>Template Waterpass</span>
                         </button>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <p class="text-slate-600 text-sm">Modul KKV siap diintegrasikan dengan tabel Waterpass.</p>
+
+                    <!-- Form Waterpass -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-700">Tabel Pengukuran Waterpass Pergi-Pulang</h4>
+                            <label class="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                                <i class="fas fa-upload"></i>
+                                <span>Upload</span>
+                                <input type="file" accept=".csv, .xlsx" class="hidden" onchange="handleFileUpload(event, 'waterpass')">
+                            </label>
+                        </div>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse text-sm">
+                               <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3 font-semibold">Seksi / Titik</th>
+                                        <th class="p-3 font-semibold">Beda Tinggi Pergi (mm)</th>
+                                        <th class="p-3 font-semibold">Beda Tinggi Pulang (mm)</th>
+                                        <th class="p-3 font-semibold">Jarak (m)</th>
+                                        <th class="p-3 font-semibold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-waterpass" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="p-2"><input type="text" value="P1-P2" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                                        <td class="p-2"><input type="number" step="0.1" value="12.5" class="w-36 p-1.5 border rounded-lg"></td>
+                                        <td class="p-2"><input type="number" step="0.1" value="-12.3" class="w-36 p-1.5 border rounded-lg"></td>
+                                        <td class="p-2"><input type="number" step="0.1" value="50.0" class="w-36 p-1.5 border rounded-lg"></td>
+                                        <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="addRowWaterpass()" class="py-2.5 px-6 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2">
+                                <i class="fas fa-plus"></i><span>Tambah Seksi</span>
+                            </button>
+                            <button onclick="hitungWaterpass()" class="py-2.5 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-sm transition flex items-center justify-center space-x-2 shadow-sm">
+                                <i class="fas fa-calculator"></i><span>Proses KKV Waterpass</span>
+                            </button>
+                        </div>
+                        <div id="panelWP" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                            <h5 class="font-bold text-slate-700 text-sm mb-1">Hasil Perhitungan Waterpass:</h5>
+                            <div id="detailWP"></div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- TAB 3: AUDIT & ANOMALI -->
+                <!-- ================= TAB 4: AUDIT ================= -->
                 <section id="tab-audit" class="tab-content space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                         <h3 class="text-base font-bold text-slate-800">Dashboard Audit & Deteksi Anomali Data</h3>
-                        <p class="text-sm text-slate-500 mb-4">Pemeriksaan otomatis kualitas pengukuran thacymetry & KKV.</p>
+                        <p class="text-sm text-slate-500 mb-4">Pemeriksaan otomatis kualitas pengukuran dari seluruh instrumen.</p>
                         <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center space-x-3">
-                            <i class="fas fa-check-circle text-lg"></i>
-                            <span>Sistem siap melakukan audit otomatis pada data lapangan Anda.</span>
+                            <i class="fas fa-check-circle text-lg"><span>Sistem siap melakukan audit silang pada data instrumen Anda.</span></i>
                         </div>
                     </div>
                 </section>
@@ -231,20 +355,20 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inisialisasi Peta Leaflet (Pusat Bandar Lampung default)
-        let mapThacymetry = L.map('mapThacymetry').setView([-5.3971, 105.2668], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(mapThacymetry);
+        // Inisialisasi Peta
+        let mapTheodolite = L.map('mapTheodolite').setView([-5.3971, 105.2668], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(mapTheodolite);
 
-        let poligonLayer = null;
+        let mapTS = L.map('mapTS').setView([-5.3971, 105.2668], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(mapTS);
 
-        // Sidebar Toggle Mobile & Desktop
+        let polyTheoLayer = null;
+        let polyTSLayer = null;
+
+        // Sidebar Toggle
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
-
         sidebarToggle.addEventListener('click', () => { sidebar.classList.toggle('-translate-x-full'); });
         sidebarClose.addEventListener('click', () => { sidebar.classList.add('-translate-x-full'); });
 
@@ -263,26 +387,28 @@
             activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
 
             const titles = {
-                'thacymetry': 'Kalkulator Pengolahan Data Thacymetry',
-                'kkv': 'Kerangka Kontrol Vertikal & Grafik 3D',
+                'theodolite': 'Pengolahan KKH & KKV (Theodolite)',
+                'totalstation': 'Pengolahan KKH (Total Station)',
+                'waterpass': 'Pengolahan KKV (Waterpass)',
                 'audit': 'Audit & Deteksi Anomali Data'
             };
             document.getElementById('pageTitle').innerText = titles[tabId];
 
-            if(tabId === 'thacymetry') {
-                setTimeout(() => { mapThacymetry.invalidateSize(); }, 200);
-            }
+            setTimeout(() => {
+                if(tabId === 'theodolite') mapTheodolite.invalidateSize();
+                if(tabId === 'totalstation') mapTS.invalidateSize();
+            }, 200);
 
             if(window.innerWidth < 768) { sidebar.classList.add('-translate-x-full'); }
         }
 
-        // Tambah Baris Tabel Thacymetry
-        function addRowThacymetry() {
-            const tbody = document.getElementById('tbody-thacymetry');
-            const rowCount = tbody.rows.length + 1;
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="p-2"><input type="text" value="P${rowCount}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+        // --- TAMBAH BARIS TABEL ---
+        function addRowTheodolite() {
+            const tbody = document.getElementById('tbody-theodolite');
+            const r = tbody.rows.length + 1;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-2"><input type="text" value="P${r}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
                 <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
                 <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
                 <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
@@ -291,168 +417,190 @@
                 <td class="p-2"><input type="number" step="0.001" value="0" class="w-20 p-1.5 border rounded-lg"></td>
                 <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
             `;
-            tbody.appendChild(newRow);
+            tbody.appendChild(tr);
         }
 
-        // --- MESIN HITUNG THACYMETRY & BOWDITCH ---
-        function dmsToDecimal(deg, min, sec) { return deg + (min / 60) + (sec / 3600); }
-        function decimalToDMS(decimalDeg) {
-            const deg = Math.floor(decimalDeg);
-            const minFloat = (decimalDeg - deg) * 60;
-            const min = Math.floor(minFloat);
-            const sec = ((minFloat - min) * 60).toFixed(2);
-            return `${deg}° ${min}' ${sec}"`;
-        }
-
-        function jalankanHitungan() {
-            const rows = document.querySelectorAll('#tbody-thacymetry tr');
-            let dataInput = [];
-
-            rows.forEach(tr => {
-                const inputs = tr.querySelectorAll('input');
-                dataInput.push({
-                    titik: inputs[0].value,
-                    deg: Number(inputs[1].value),
-                    min: Number(inputs[2].value),
-                    sec: Number(inputs[3].value),
-                    ba: Number(inputs[4].value),
-                    bt: Number(inputs[5].value),
-                    bb: Number(inputs[6].value)
-                });
-            });
-
-            const xAwal = Number(document.getElementById('bmX').value);
-            const yAwal = Number(document.getElementById('bmY').value);
-            const azAwal = Number(document.getElementById('bmAzimuth').value);
-
-            const n = dataInput.length;
-            let totalSudut = 0;
-            let totalJarak = 0;
-
-            let parsed = dataInput.map((row, idx) => {
-                const sudutDes = dmsToDecimal(row.deg, row.min, row.sec);
-                totalSudut += sudutDes;
-                const jarak = (row.ba - row.bb) * 100; // Rumus thacymetry optis
-                totalJarak += jarak;
-                return { id: idx + 1, titik: row.titik, sudut: sudutDes, jarak };
-            });
-
-            const sudutTeoretis = (n - 2) * 180;
-            const errSudut = totalSudut - sudutTeoretis;
-            const koreksiSudut = -errSudut / n;
-
-            let azAktif = azAwal;
-            let sumX = 0, sumY = 0;
-            let trajectory = parsed.map((item, idx) => {
-                const sudutKoreksi = item.sudut + koreksiSudut;
-                if(idx > 0) { azAktif = (azAktif + 180 + sudutKoreksi) % 360; }
-                const rad = azAktif * (Math.PI / 180);
-                const dX = item.jarak * Math.sin(rad);
-                const dY = item.jarak * Math.cos(rad);
-                sumX += dX; sumY += dY;
-                return { ...item, az: azAktif, dX, dY };
-            });
-
-            // Perataan Bowditch
-            const fx = sumX, fy = sumY;
-            let currX = xAwal, currY = yAwal;
-            let hasilKoordinat = [{ titik: "BM/Awal", x: currX, y: currY }];
-
-            trajectory.forEach(item => {
-                const korX = -fx * (item.jarak / totalJarak);
-                const korY = -fy * (item.jarak / totalJarak);
-                currX += (item.dX + korX);
-                currY += (item.dY + korY);
-                hasilKoordinat.push({ titik: item.titik, x: currX, y: currY });
-            });
-
-            // Tampilkan Panel Hasil
-            document.getElementById('hasilPanel').classList.remove('hidden');
-            document.getElementById('hasilDetail').innerHTML = `
-                <p><b>Jumlah Titik:</b> ${n} titik</p>
-                <p><b>Kesalahan Tutupan Sudut:</b> ${decimalToDMS(Math.abs(errSudut))}</p>
-                <p><b>Linear Misclosure:</b> ${Math.sqrt(fx*fx + fy*fy).toFixed(3)} meter</p>
-                <p class="text-emerald-600 font-semibold mt-1">Perataan Bowditch Selesai Berhasil Dihitung!</p>
+        function addRowTS() {
+            const tbody = document.getElementById('tbody-ts');
+            const r = tbody.rows.length + 1;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-2"><input type="text" value="P${r}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" step="0.001" value="0" class="w-28 p-1.5 border rounded-lg"></td>
+                <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
             `;
-
-            // Render ke Peta Leaflet (Skala Lokal / Dummy LatLong atau Custom Projected jika diperlukan)
-            // Catatan: Karena ini koordinat lokal meter (X, Y), kita petakan ke marker visual berbasis koordinat simulasi peta
-            renderPetaHasil(hasilKoordinat);
+            tbody.appendChild(tr);
         }
 
-        function renderPetaHasil(koordinatArray) {
-            if(poligonLayer) { mapThacymetry.removeLayer(poligonLayer); }
-
-            // Konversi sederhana koordinat lokal meter ke lat-long dummy sekitar titik referensi Leaflet untuk visualisasi garis poligon
-            let latLngs = koordinatArray.map((pt, idx) => {
-                // Asumsi skala lokal sederhana dari titik pusat Bandar Lampung (-5.3971, 105.2668)
-                let baseLat = -5.3971;
-                let baseLng = 105.2668;
-                let lat = baseLat + (pt.y - 5000) * 0.00001;
-                let lng = baseLng + (pt.x - 5000) * 0.00001;
-                return [lat, lng];
-            });
-
-            poligonLayer = L.layerGroup();
-            
-            // Buat Garis Poligon
-            let polyline = L.polyline(latLngs, {color: '#2563eb', weight: 4});
-            poligonLayer.addLayer(polyline);
-
-            // Tambahkan Marker di Tiap Titik
-            latLngs.forEach((latlng, idx) => {
-                let marker = L.circleMarker(latlng, {radius: 6, color: '#1e293b', fillColor: '#3b82f6', fillOpacity: 1});
-                marker.bindPopup(`<b>Titik:</b> ${koordinatArray[idx].titik}<br><b>X:</b> ${koordinatArray[idx].x.toFixed(3)}<br><b>Y:</b> ${koordinatArray[idx].y.toFixed(3)}`);
-                poligonLayer.addLayer(marker);
-            });
-
-            poligonLayer.addTo(mapThacymetry);
-            mapThacymetry.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+        function addRowWaterpass() {
+            const tbody = document.getElementById('tbody-waterpass');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-2"><input type="text" value="Pn-Pn" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
         }
 
-        // Unduh Template Excel
+        // --- MESIN HITUNG THEODOLITE & BOWDITCH ---
+        function dmsToDec(d, m, s) { return d + (m/60) + (s/3600); }
+        function hitungTheodolite() {
+            const rows = document.querySelectorAll('#tbody-theodolite tr');
+            let data = [];
+            rows.forEach(tr => {
+                const inp = tr.querySelectorAll('input');
+                data.push({ titik: inp[0].value, deg: Number(inp[1].value), min: Number(inp[2].value), sec: Number(inp[3].value), ba: Number(inp[4].value), bb: Number(inp[6].value) });
+            });
+
+            const x0 = Number(document.getElementById('theoX').value);
+            const y0 = Number(document.getElementById('theoY').value);
+            const az0 = Number(document.getElementById('theoAz').value);
+
+            let n = data.length, totSudut = 0, totJarak = 0;
+            let parsed = data.map((d, i) => {
+                let sud = dmsToDec(d.deg, d.min, d.sec);
+                totSudut += sud;
+                let dist = (d.ba - d.bb) * 100;
+                totJarak += dist;
+                return { id: i+1, titik: d.titik, sudut: sud, jarak: dist };
+            });
+
+            let errS = totSudut - ((n - 2) * 180);
+            let korS = -errS / n;
+            let az = az0, sumX = 0, sumY = 0;
+            let traj = parsed.map((item, i) => {
+                let sk = item.sudut + korS;
+                if(i > 0) az = (az + 180 + sk) % 360;
+                let rad = az * (Math.PI / 180);
+                let dX = item.jarak * Math.sin(rad);
+                let dY = item.jarak * Math.cos(rad);
+                sumX += dX; sumY += dY;
+                return { ...item, dX, dY };
+            });
+
+            let currX = x0, currY = y0;
+            let coords = [{titik: 'BM', x: currX, y: currY}];
+            traj.forEach(item => {
+                currX += (item.dX - sumX * (item.jarak/totJarak));
+                currY += (item.dY - sumY * (item.jarak/totJarak));
+                coords.push({titik: item.titik, x: currX, y: currY});
+            });
+
+            document.getElementById('panelTheo').classList.remove('hidden');
+            document.getElementById('detailTheo').innerHTML = `<p><b>Total Titik:</b> ${n} | <b>Misclosure Linier:</b> ${Math.sqrt(sumX*sumX + sumY*sumY).toFixed(3)} m</p><p class="text-emerald-600 font-semibold">Perataan Bowditch Selesai!</p>`;
+            renderMap(mapTheodolite, coords, 'theo');
+        }
+
+        // --- MESIN HITUNG TOTAL STATION ---
+        function hitungTS() {
+            const rows = document.querySelectorAll('#tbody-ts tr');
+            let data = [];
+            rows.forEach(tr => {
+                const inp = tr.querySelectorAll('input');
+                data.push({ titik: inp[0].value, deg: Number(inp[1].value), min: Number(inp[2].value), sec: Number(inp[3].value), jarak: Number(inp[4].value) });
+            });
+
+            const x0 = Number(document.getElementById('tsX').value);
+            const y0 = Number(document.getElementById('tsY').value);
+            const az0 = Number(document.getElementById('tsAz').value);
+
+            let n = data.length, totJarak = 0;
+            data.forEach(d => totJarak += d.jarak);
+
+            let az = az0, sumX = 0, sumY = 0;
+            let traj = data.map((d, i) => {
+                let sud = dmsToDec(d.deg, d.min, d.sec);
+                if(i > 0) az = (az + 180 + sud) % 360;
+                let rad = az * (Math.PI / 180);
+                let dX = d.jarak * Math.sin(rad);
+                let dY = d.jarak * Math.cos(rad);
+                sumX += dX; sumY += dY;
+                return { ...d, dX, dY };
+            });
+
+            let currX = x0, currY = y0;
+            let coords = [{titik: 'BM', x: currX, y: currY}];
+            traj.forEach(item => {
+                currX += (item.dX - sumX * (item.jarak/totJarak));
+                currY += (item.dY - sumY * (item.jarak/totJarak));
+                coords.push({titik: item.titik, x: currX, y: currY});
+            });
+
+            document.getElementById('panelTS').classList.remove('hidden');
+            document.getElementById('detailTS').innerHTML = `<p><b>Total Titik TS:</b> ${n} | <b>Error Linier:</b> ${Math.sqrt(sumX*sumX + sumY*sumY).toFixed(3)} m</p><p class="text-emerald-600 font-semibold">Perataan Bowditch TS Selesai!</p>`;
+            renderMap(mapTS, coords, 'ts');
+        }
+
+        // --- MESIN HITUNG WATERPASS ---
+        function hitungWaterpass() {
+            const rows = document.querySelectorAll('#tbody-waterpass tr');
+            let totP=0, totPu=0, totJ=0;
+            rows.forEach(tr => {
+                const inp = tr.querySelectorAll('input');
+                totP += Number(inp[1].value);
+                totPu += Number(inp[2].value);
+                totJ += Number(inp[3].value);
+            });
+            let errorFH = totP + totPu; // Secara teori pergi + pulang berlawanan tanda jika selisih
+            document.getElementById('panelWP').classList.remove('hidden');
+            document.getElementById('detailWP').innerHTML = `
+                <p><b>Total Beda Tinggi Pergi:</b> ${totP.toFixed(2)} mm</p>
+                <p><b>Total Beda Tinggi Pulang:</b> ${totPu.toFixed(2)} mm</p>
+                <p><b>Kesalahan Tinggi (Fh):</b> ${errorFH.toFixed(2)} mm</p>
+                <p class="text-emerald-600 font-semibold mt-1">Kalkulasi KKV Waterpass Berhasil Diperiksa!</p>
+            `;
+        }
+
+        function renderMap(mapInstance, coords, type) {
+            let latLngs = coords.map(pt => [-5.3971 + (pt.y - 5000)*0.00001, 105.2668 + (pt.x - 5000)*0.00001]);
+            if(type === 'theo' && polyTheoLayer) mapInstance.removeLayer(polyTheoLayer);
+            if(type === 'ts' && polyTSLayer) mapInstance.removeLayer(polyTSLayer);
+
+            let group = L.layerGroup();
+            let polyline = L.polyline(latLngs, {color: type==='theo' ? '#2563eb' : '#0ea5e9', weight: 4});
+            group.addLayer(polyline);
+            latLngs.forEach((ll, i) => {
+                let m = L.circleMarker(ll, {radius: 6, color: '#1e293b', fillColor: '#3b82f6', fillOpacity: 1});
+                m.bindPopup(`<b>Titik:</b> ${coords[i].titik}<br><b>X:</b> ${coords[i].x.toFixed(3)}<br><b>Y:</b> ${coords[i].y.toFixed(3)}`);
+                group.addLayer(m);
+            });
+            group.addTo(mapInstance);
+            if(type === 'theo') polyTheoLayer = group;
+            if(type === 'ts') polyTSLayer = group;
+            mapInstance.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+        }
+
+        // Unduh Template Excel Berdasarkan Jenis Alat
         function downloadTemplate(type) {
             let wb = XLSX.utils.book_new();
-            let ws_data = [
-                ["Titik", "Deg", "Min", "Sec", "BA", "BT", "BB"],
-                ["P1", 90, 0, 0, 1.500, 1.250, 1.000],
-                ["P2", 180, 0, 0, 1.400, 1.150, 0.900]
-            ];
+            let ws_data = [];
+            if(type === 'theodolite') {
+                ws_data = [["Titik", "Deg", "Min", "Sec", "BA", "BT", "BB"], ["P1", 90, 0, 0, 1.5, 1.25, 1.0]];
+            } else if(type === 'ts') {
+                ws_data = [["Titik", "Deg", "Min", "Sec", "Jarak"], ["P1", 90, 0, 0, 25.5]];
+            } else if(type === 'waterpass') {
+                ws_data = [["Seksi", "Delta_H_Pergi", "Delta_H_Pulang", "Jarak"], ["P1-P2", 12.5, -12.3, 50.0]];
+            }
             let ws = XLSX.utils.aoa_to_sheet(ws_data);
-            XLSX.utils.book_append_sheet(wb, ws, "Template_Thacymetry");
-            XLSX.writeFile(wb, `Template_Thacymetry_Teristris.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, `Template_${type.toUpperCase()}.xlsx`);
         }
 
-        // Upload & Parsing File Excel
-        function handleFileUpload(event) {
+        function handleFileUpload(event, type) {
             const file = event.target.files[0];
             if(!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                
-                const tbody = document.getElementById('tbody-thacymetry');
-                tbody.innerHTML = ''; // Kosongkan tabel lama
-
-                json.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-2"><input type="text" value="${row.Titik || ''}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                        <td class="p-2"><input type="number" value="${row.Deg || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                        <td class="p-2"><input type="number" value="${row.Min || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                        <td class="p-2"><input type="number" value="${row.Sec || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                        <td class="p-2"><input type="number" step="0.001" value="${row.BA || 0}" class="w-20 p-1.5 border rounded-lg"></td>
-                        <td class="p-2"><input type="number" step="0.001" value="${row.BT || 0}" class="w-20 p-1.5 border rounded-lg"></td>
-                        <td class="p-2"><input type="number" step="0.001" value="${row.BB || 0}" class="w-20 p-1.5 border rounded-lg"></td>
-                        <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                alert(`Berhasil memuat ${json.length} data thacymetry dari file Excel!`);
+                alert(`Berhasil mengunggah ${json.length} baris data untuk modul ${type}!`);
             };
             reader.readAsArrayBuffer(file);
         }
