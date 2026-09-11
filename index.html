@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS Teristris - Perhitungan Data Otomatis</title>
+    <title>WebGIS Teristris - Pengolahan Data Otomatis</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -88,7 +88,7 @@
             </div>
 
             <div class="px-2 text-xs text-slate-500 border-t border-slate-800 pt-4">
-                <p>Data adalah hasil yang tidak boleh dan haram untuk dimanipulasi :)</p>
+                <p>Data lapangan, haram untuk dimanipulasi</p>
                 <p class="mt-1">© 2026 WebGIS Teristris by 123230055</p>
             </div>
         </aside>
@@ -117,7 +117,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Lembar Kerja KKH & Perataan Bowditch Otomatis</h3>
-                            <p class="text-sm text-slate-500">Masukkan parameter awal, target ketelitian, serta sudut terukur (β) dan jarak.</p>
+                            <p class="text-sm text-slate-500">Masukkan parameter awal, spesifikasi alat, serta sudut terukur (β) dan jarak.</p>
                         </div>
                         <button onclick="downloadTemplate('kkh')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
@@ -125,14 +125,14 @@
                         </button>
                     </div>
 
-                    <!-- Parameter Awal BM & Target Ketelitian -->
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Parameter Awal BM & Spesifikasi Toleransi Alat -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X (Lokal)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal X</label>
                             <input type="number" id="kkhX0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal Y (Lokal)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Koordinat Awal Y</label>
                             <input type="number" id="kkhY0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
@@ -140,7 +140,11 @@
                             <input type="number" id="kkhAz0" value="201.703" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Target Ketelitian (1 : ...)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Ketelitian Alat (Detik / '')</label>
+                            <input type="number" id="ketelitianAlat" value="20" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Target Rasio (1 : ...)</label>
                             <input type="number" id="targetKetelitian" value="5000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-blue-50 font-bold text-blue-700">
                         </div>
                     </div>
@@ -230,14 +234,22 @@
                             </table>
                         </div>
 
-                        <!-- Ringkasan Error / Kotak Penutup Sudut -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-sm">
-                                <h5 class="font-bold text-slate-700 border-b pb-1">Evaluasi Kesalahan Penutup Sudut & Linier</h5>
-                                <div id="detailErrorKKH" class="space-y-1 text-slate-600"></div>
+                        <!-- Kotak Ringkasan Kesalahan Penutup Sudut & Toleransi (Persis Seperti Kolom R Excel) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4">
+                            <div class="lg:col-span-6 bg-white border border-slate-300 rounded-xl overflow-hidden shadow-sm">
+                                <div class="bg-amber-200 text-slate-800 font-bold px-4 py-2.5 text-sm border-b border-slate-300 flex items-center justify-between">
+                                    <span>Kesalahan Penutup Sudut & Toleransi Alat</span>
+                                    <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <table class="w-full text-sm">
+                                    <tbody id="excelSummaryBox" class="divide-y divide-slate-200">
+                                        <!-- Akan diisi otomatis oleh JavaScript -->
+                                    </tbody>
+                                </table>
                             </div>
+
                             <!-- Peta Leaflet KKH -->
-                            <div class="bg-white p-2 rounded-xl border border-slate-200 flex flex-col h-[300px]">
+                            <div class="lg:col-span-6 bg-white p-2 rounded-xl border border-slate-200 flex flex-col h-[320px]">
                                 <h5 class="font-bold text-slate-700 text-xs mb-2">Visualisasi Poligon 2D</h5>
                                 <div id="mapKKH" class="w-full flex-1 rounded-lg z-0"></div>
                             </div>
@@ -351,7 +363,7 @@
                     </div>
                 </section>
 
-                <!-- ================= TAB AUDIT & ANOMALI (DETAIL TITIK & SOLUSI) ================= -->
+                <!-- ================= TAB AUDIT & ANOMALI ================= -->
                 <section id="tab-audit" class="tab-content space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                         <div>
@@ -461,12 +473,20 @@
             const x0 = Number(document.getElementById('kkhX0').value);
             const y0 = Number(document.getElementById('kkhY0').value);
             const az0 = Number(document.getElementById('kkhAz0').value);
+            const ketelitianAlatDetik = Number(document.getElementById('ketelitianAlat').value) || 20;
             const targetKet = Number(document.getElementById('targetKetelitian').value) || 5000;
 
             let n = rawData.length;
             let sumBeta = rawData.reduce((acc, cur) => acc + cur.beta, 0);
-            let fb = sumBeta - 360; 
+            let syaratBeta = 360; // Total syarat poligon tertutup
+            let fb = sumBeta - syaratBeta; 
             let koreksiSudutPerTitik = -fb / n;
+
+            // Hitung toleransi sudut alat: Toleransi = m * sqrt(n) (dalam detik, lalu dikonversi ke derajat)
+            let toleransiDetik = ketelitianAlatDetik * Math.sqrt(n);
+            let toleransiDeg = toleransiDetik / 3600;
+            let fbDetik = Math.abs(fb) * 3600;
+            let isSudutLolos = fbDetik <= toleransiDetik;
 
             let totalJarak = rawData.reduce((acc, cur) => acc + cur.jarak, 0);
 
@@ -546,7 +566,6 @@
                 });
             });
 
-            // Urutkan titik berdasarkan besar koreksi (terbesar ke terkecil) untuk mendeteksi titik paling kritis
             pointAudits.sort((a, b) => b.korMagnitude - a.korMagnitude);
 
             const tbody = document.getElementById('tbody-hasil-kkh');
@@ -574,13 +593,17 @@
 
             let linearMisclosure = Math.sqrt(sumDX*sumDX + sumDY*sumDY);
             let ketelitianAktual = Math.round(totalJarak / linearMisclosure);
-            let isLolos = ketelitianAktual >= targetKet;
+            let isLolos = ketelitianAktual >= targetKet && isSudutLolos;
 
             lastAuditData = {
                 type: 'KKH',
                 n,
                 sumBeta,
+                syaratBeta,
                 fb,
+                toleransiDetik,
+                fbDetik,
+                isSudutLolos,
                 totalJarak,
                 sumDX,
                 sumDY,
@@ -591,24 +614,22 @@
                 pointAudits
             };
 
-            document.getElementById('detailErrorKKH').innerHTML = `
-                <p><b>Jumlah Sudut (Σβ):</b> ${sumBeta.toFixed(3)}°</p>
-                <p><b>Kesalahan Sudut (fβ):</b> ${fb.toFixed(4)}°</p>
-                <p><b>Total Jarak:</b> ${totalJarak.toFixed(3)} m</p>
-                <p><b>Kesalahan Absis (Fx):</b> ${sumDX.toFixed(5)} m</p>
-                <p><b>Kesalahan Ordinat (Fy):</b> ${sumDY.toFixed(5)} m</p>
-                <p><b>Linear Misclosure (fl):</b> ${linearMisclosure.toFixed(5)} m (Ketelitian 1 : ${ketelitianAktual} | Target: 1 : ${targetKet})</p>
-                <p class="${isLolos ? 'text-emerald-600' : 'text-amber-600'} font-bold mt-1">
-                    <i class="fas ${isLolos ? 'fa-check-circle' : 'fa-exclamation-triangle'} mr-1"></i> 
-                    ${isLolos ? 'Pengukuran Memenuhi Target Ketelitian!' : 'Peringatan: Di Bawah Target Ketelitian Orde!'}
-                </p>
+            // Render kotak ringkasan persis gaya Excel di Kolom R
+            const summaryBox = document.getElementById('excelSummaryBox');
+            summaryBox.innerHTML = `
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Σ β</td><td class="p-2 text-right font-mono">${sumBeta.toFixed(3)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Σ Syarat</td><td class="p-2 text-right font-mono">${syaratBeta.toFixed(3)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Toleransi Alat (${ketelitianAlatDetik}'')</td><td class="p-2 text-right font-mono">${toleransiDeg.toFixed(6)}° (${toleransiDetik.toFixed(1)}')</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">fβ (Error Sudut)</td><td class="p-2 text-right font-mono ${isSudutLolos ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}">${fb.toFixed(6)}°</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">fl (Linear Misclosure)</td><td class="p-2 text-right font-mono">${linearMisclosure.toFixed(5)} m (1:${ketelitianAktual})</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Absis (Fx)</td><td class="p-2 text-right font-mono">${sumDX.toFixed(5)}</td></tr>
+                <tr><td class="p-2 text-left font-medium bg-slate-50">Ordinat (Fy)</td><td class="p-2 text-right font-mono">${sumDY.toFixed(5)}</td></tr>
             `;
 
             document.getElementById('resultCardKKH').classList.remove('hidden');
             renderMapKKH(finalResults);
         }
 
-        // --- RENDER DASHBOARD AUDIT DENGAN TITIK KRITIS & SOLUSI ---
         function renderAuditDashboard() {
             const container = document.getElementById('auditReportContainer');
             if(!lastAuditData) {
@@ -622,7 +643,7 @@
 
             let d = lastAuditData;
             let statusWarna = d.isLolos ? "text-emerald-600 bg-emerald-50 border-emerald-200" : "text-amber-600 bg-amber-50 border-amber-200";
-            let topProblemPoint = d.pointAudits[0]; // Titik dengan koreksi terbesar
+            let topProblemPoint = d.pointAudits[0];
 
             let rowsHTML = '';
             d.pointAudits.forEach((pt, index) => {
@@ -639,15 +660,14 @@
             });
 
             container.innerHTML = `
-                <!-- Ringkasan Kartu -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
                         <span class="text-xs text-slate-400 font-semibold uppercase">Jumlah Titik</span>
                         <div class="text-2xl font-bold text-slate-800 mt-1">${d.n} Titik</div>
                     </div>
                     <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <span class="text-xs text-slate-400 font-semibold uppercase">Kesalahan Sudut (fβ)</span>
-                        <div class="text-2xl font-bold text-blue-600 mt-1">${d.fb.toFixed(4)}°</div>
+                        <span class="text-xs text-slate-400 font-semibold uppercase">Status Sudut (fβ vs Toleransi)</span>
+                        <div class="text-lg font-bold ${d.isSudutLolos ? 'text-emerald-600' : 'text-rose-600'} mt-1">${d.isSudutLolos ? 'Lolos Toleransi Alat' : 'Melebihi Toleransi'}</div>
                     </div>
                     <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
                         <span class="text-xs text-slate-400 font-semibold uppercase">Ketelitian Aktual</span>
@@ -659,16 +679,14 @@
                     </div>
                 </div>
 
-                <!-- Status Verifikasi -->
                 <div class="p-4 rounded-xl border ${statusWarna} flex items-center justify-between">
                     <div>
-                        <h4 class="font-bold text-sm">Status Verifikasi: <span class="uppercase">${d.isLolos ? 'Lolos Spesifikasi Target' : 'Tidak Memenuhi Target Orde'}</span></h4>
+                        <h4 class="font-bold text-sm">Status Verifikasi Keseluruhan: <span class="uppercase">${d.isLolos ? 'Lolos Spesifikasi Target' : 'Tidak Memenuhi Target Orde'}</span></h4>
                         <p class="text-xs mt-0.5 opacity-90">Total panjang lintasan ${d.totalJarak.toFixed(3)} meter dengan kesalahan linier ${d.linearMisclosure.toFixed(4)} meter.</p>
                     </div>
                     <i class="fas ${d.isLolos ? 'fa-shield-check' : 'fa-exclamation-circle'} text-2xl"></i>
                 </div>
 
-                <!-- ANALISIS TITIK BERMASALAH & SOLUSI -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <div class="lg:col-span-7 bg-white p-5 border border-slate-200 rounded-xl space-y-3">
                         <h4 class="font-bold text-slate-800 text-sm"><i class="fas fa-list-ol mr-2 text-blue-600"></i>Peringkat Akumulasi Koreksi Per Titik</h4>
@@ -696,16 +714,13 @@
                                 <p><b>Titik Paling Kritis: <span class="text-rose-600 font-bold">${topProblemPoint.titik}</span></b></p>
                                 <p>Titik ini menyerap nilai koreksi Bowditch terbesar sebesar <b>${topProblemPoint.korMagnitude.toFixed(4)} meter</b>.</p>
                                 <hr class="border-amber-200 my-1">
-                                <p class="font-semibold text-slate-800 mt-2">Tindakan Perbaikan:</p>
+                                <p class="font-semibold text-slate-800 mt-2"> Saran Tindakan Perbaikan:</p>
                                 <ul class="list-disc pl-4 space-y-1 text-slate-700">
-                                    <li>Periksa kembali catatan buku ukur (obs. sheet) pada seksi menuju atau meninggalkan titik <b>${topProblemPoint.titik}</b>.</li>
-                                    <li>Kemungkinan besar terjadi kesalahan pembacaan sudut horizontal atau kesalahan pembacaan benang rambu (BA/BB) yang terlalu panjang/pendek.</li>
-                                    <li>Jika diperlukan, lakukan <b>pengukuran ulang (re-survey)</b> khusus pada sudut di titik ${topProblemPoint.titik}.</li>
+                                    <li>Periksa kembali catatan buku ukur pada seksi menuju titik <b>${topProblemPoint.titik}</b>.</li>
+                                    <li>Validasi pembacaan sudut horizontal atau pembacaan benang rambu (BA/BB).</li>
+                                    <li>Lakukan <b>pengukuran ulang (re-survey)</b> khusus pada titik tersebut jika melampaui batas toleransi spesifikasi alat.</li>
                                 </ul>
                             </div>
-                        </div>
-                        <div class="text-[11px] text-slate-400 italic">
-                            *Catatan: Titik dengan koreksi terbesar secara otomatis diidentifikasi berdasarkan besar vektor perpindahan koreksi Bowditch.
                         </div>
                     </div>
                 </div>
