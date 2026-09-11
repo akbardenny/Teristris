@@ -17,14 +17,18 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* Kelas untuk menutup sidebar secara penuh di desktop maupun HP */
+        #sidebar.is-closed {
+            transform: translateX(-100%) !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased">
 
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen overflow-hidden relative">
         
         <!-- SIDEBAR NAVIGASI BERDASARKAN ALAT -->
-        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out z-50 flex flex-col justify-between shadow-xl">
+        <aside id="sidebar" class="bg-slate-900 text-slate-300 w-72 space-y-6 py-6 px-4 absolute inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-300 ease-in-out z-50 flex flex-col justify-between shadow-xl">
             <div>
                 <!-- Brand Logo -->
                 <div class="flex items-center justify-between px-2 mb-8">
@@ -85,7 +89,7 @@
         </aside>
 
         <!-- KONTEN UTAMA -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden w-full">
             
             <!-- Top Navbar -->
             <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 z-10 shadow-sm">
@@ -160,16 +164,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-theodolite" class="divide-y divide-slate-100">
-                                        <tr>
-                                            <td class="p-2"><input type="text" value="P1" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                                            <td class="p-2"><input type="number" value="90" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="1.500" class="w-20 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="1.250" class="w-20 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="1.000" class="w-20 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
-                                        </tr>
+                                        <!-- Tabel dimulai kosong sesuai permintaan -->
                                     </tbody>
                                 </table>
                             </div>
@@ -246,14 +241,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-ts" class="divide-y divide-slate-100">
-                                        <tr>
-                                            <td class="p-2"><input type="text" value="P1" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                                            <td class="p-2"><input type="number" value="90" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                                            <td class="p-2"><input type="number" step="0.001" value="25.500" class="w-28 p-1.5 border rounded-lg"></td>
-                                            <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
-                                        </tr>
+                                        <!-- Tabel dimulai kosong -->
                                     </tbody>
                                 </table>
                             </div>
@@ -312,13 +300,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-waterpass" class="divide-y divide-slate-100">
-                                    <tr>
-                                        <td class="p-2"><input type="text" value="P1-P2" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                                        <td class="p-2"><input type="number" step="0.1" value="12.5" class="w-36 p-1.5 border rounded-lg"></td>
-                                        <td class="p-2"><input type="number" step="0.1" value="-12.3" class="w-36 p-1.5 border rounded-lg"></td>
-                                        <td class="p-2"><input type="number" step="0.1" value="50.0" class="w-36 p-1.5 border rounded-lg"></td>
-                                        <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
-                                    </tr>
+                                    <!-- Tabel dimulai kosong -->
                                 </tbody>
                             </table>
                         </div>
@@ -343,7 +325,7 @@
                         <h3 class="text-base font-bold text-slate-800">Dashboard Audit & Deteksi Anomali Data</h3>
                         <p class="text-sm text-slate-500 mb-4">Pemeriksaan otomatis kualitas pengukuran dari seluruh instrumen.</p>
                         <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center space-x-3">
-                            <i class="fas fa-check-circle text-lg"><span>Sistem siap melakukan audit silang pada data instrumen Anda.</span></i>
+                            <i class="fas fa-check-circle text-lg"></i><span>Sistem siap melakukan audit silang pada data instrumen Anda.</span>
                         </div>
                     </div>
                 </section>
@@ -365,12 +347,17 @@
         let polyTheoLayer = null;
         let polyTSLayer = null;
 
-        // Sidebar Toggle
+        // Sidebar Toggle Universal (Bisa ditutup/dibuka di HP maupun Laptop)
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarClose = document.getElementById('sidebarClose');
-        sidebarToggle.addEventListener('click', () => { sidebar.classList.toggle('-translate-x-full'); });
-        sidebarClose.addEventListener('click', () => { sidebar.classList.add('-translate-x-full'); });
+
+        sidebarToggle.addEventListener('click', () => { 
+            sidebar.classList.toggle('is-closed'); 
+        });
+        sidebarClose.addEventListener('click', () => { 
+            sidebar.classList.add('is-closed'); 
+        });
 
         // Tab Switcher
         function switchTab(tabId) {
@@ -399,22 +386,21 @@
                 if(tabId === 'totalstation') mapTS.invalidateSize();
             }, 200);
 
-            if(window.innerWidth < 768) { sidebar.classList.add('-translate-x-full'); }
+            if(window.innerWidth < 768) { sidebar.classList.add('is-closed'); }
         }
 
-        // --- TAMBAH BARIS TABEL ---
+        // --- TAMBAH BARIS TABEL DENGAN PLACEHOLDER "Input..." ---
         function addRowTheodolite() {
             const tbody = document.getElementById('tbody-theodolite');
-            const r = tbody.rows.length + 1;
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-2"><input type="text" value="P${r}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" value="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" step="0.001" value="0" class="w-20 p-1.5 border rounded-lg"></td>
-                <td class="p-2"><input type="number" step="0.001" value="0" class="w-20 p-1.5 border rounded-lg"></td>
-                <td class="p-2"><input type="number" step="0.001" value="0" class="w-20 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="text" placeholder="Input titik" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" step="0.001" placeholder="0.000" class="w-20 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.001" placeholder="0.000" class="w-20 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.001" placeholder="0.000" class="w-20 p-1.5 border rounded-lg"></td>
                 <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
@@ -422,14 +408,13 @@
 
         function addRowTS() {
             const tbody = document.getElementById('tbody-ts');
-            const r = tbody.rows.length + 1;
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-2"><input type="text" value="P${r}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" value="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
-                <td class="p-2"><input type="number" step="0.001" value="0" class="w-28 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="text" placeholder="Input titik" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" placeholder="0" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                <td class="p-2"><input type="number" step="0.001" placeholder="0.000" class="w-28 p-1.5 border rounded-lg"></td>
                 <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
@@ -439,10 +424,10 @@
             const tbody = document.getElementById('tbody-waterpass');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-2"><input type="text" value="Pn-Pn" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
-                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
-                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
-                <td class="p-2"><input type="number" step="0.1" value="0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="text" placeholder="Input Seksi" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                <td class="p-2"><input type="number" step="0.1" placeholder="0.0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.1" placeholder="0.0" class="w-36 p-1.5 border rounded-lg"></td>
+                <td class="p-2"><input type="number" step="0.1" placeholder="0.0" class="w-36 p-1.5 border rounded-lg"></td>
                 <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
@@ -452,6 +437,7 @@
         function dmsToDec(d, m, s) { return d + (m/60) + (s/3600); }
         function hitungTheodolite() {
             const rows = document.querySelectorAll('#tbody-theodolite tr');
+            if(rows.length === 0) { alert('Silakan tambahkan data atau upload template terlebih dahulu.'); return; }
             let data = [];
             rows.forEach(tr => {
                 const inp = tr.querySelectorAll('input');
@@ -500,6 +486,7 @@
         // --- MESIN HITUNG TOTAL STATION ---
         function hitungTS() {
             const rows = document.querySelectorAll('#tbody-ts tr');
+            if(rows.length === 0) { alert('Silakan tambahkan data atau upload template terlebih dahulu.'); return; }
             let data = [];
             rows.forEach(tr => {
                 const inp = tr.querySelectorAll('input');
@@ -540,6 +527,7 @@
         // --- MESIN HITUNG WATERPASS ---
         function hitungWaterpass() {
             const rows = document.querySelectorAll('#tbody-waterpass tr');
+            if(rows.length === 0) { alert('Silakan tambahkan data atau upload template terlebih dahulu.'); return; }
             let totP=0, totPu=0, totJ=0;
             rows.forEach(tr => {
                 const inp = tr.querySelectorAll('input');
@@ -547,7 +535,7 @@
                 totPu += Number(inp[2].value);
                 totJ += Number(inp[3].value);
             });
-            let errorFH = totP + totPu; // Secara teori pergi + pulang berlawanan tanda jika selisih
+            let errorFH = totP + totPu;
             document.getElementById('panelWP').classList.remove('hidden');
             document.getElementById('detailWP').innerHTML = `
                 <p><b>Total Beda Tinggi Pergi:</b> ${totP.toFixed(2)} mm</p>
@@ -576,22 +564,23 @@
             mapInstance.fitBounds(polyline.getBounds(), {padding: [50, 50]});
         }
 
-        // Unduh Template Excel Berdasarkan Jenis Alat
+        // Unduh Template Excel Sesuai Format Kolom Upload
         function downloadTemplate(type) {
             let wb = XLSX.utils.book_new();
             let ws_data = [];
             if(type === 'theodolite') {
-                ws_data = [["Titik", "Deg", "Min", "Sec", "BA", "BT", "BB"], ["P1", 90, 0, 0, 1.5, 1.25, 1.0]];
+                ws_data = [["Titik", "Deg", "Min", "Sec", "BA", "BT", "BB"]];
             } else if(type === 'ts') {
-                ws_data = [["Titik", "Deg", "Min", "Sec", "Jarak"], ["P1", 90, 0, 0, 25.5]];
+                ws_data = [["Titik", "Deg", "Min", "Sec", "Jarak"]];
             } else if(type === 'waterpass') {
-                ws_data = [["Seksi", "Delta_H_Pergi", "Delta_H_Pulang", "Jarak"], ["P1-P2", 12.5, -12.3, 50.0]];
+                ws_data = [["Seksi", "Delta_H_Pergi", "Delta_H_Pulang", "Jarak"]];
             }
             let ws = XLSX.utils.aoa_to_sheet(ws_data);
             XLSX.utils.book_append_sheet(wb, ws, "Template");
             XLSX.writeFile(wb, `Template_${type.toUpperCase()}.xlsx`);
         }
 
+        // Upload & Parsing Excel yang Sinkron
         function handleFileUpload(event, type) {
             const file = event.target.files[0];
             if(!file) return;
@@ -600,7 +589,55 @@
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                alert(`Berhasil mengunggah ${json.length} baris data untuk modul ${type}!`);
+                
+                if(type === 'theodolite') {
+                    const tbody = document.getElementById('tbody-theodolite');
+                    tbody.innerHTML = '';
+                    json.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-2"><input type="text" value="${row.Titik || ''}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                            <td class="p-2"><input type="number" value="${row.Deg || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" value="${row.Min || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" value="${row.Sec || 0}" class="w-16 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" step="0.001" value="${row.BA || 0}" class="w-20 p-1.5 border rounded-lg"></td>
+                            <td class="p-2"><input type="number" step="0.001" value="${row.BT || 0}" class="w-20 p-1.5 border rounded-lg"></td>
+                            <td class="p-2"><input type="number" step="0.001" value="${row.BB || 0}" class="w-20 p-1.5 border rounded-lg"></td>
+                            <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else if(type === 'ts') {
+                    const tbody = document.getElementById('tbody-ts');
+                    tbody.innerHTML = '';
+                    json.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-2"><input type="text" value="${row.Titik || ''}" class="w-16 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                            <td class="p-2"><input type="number" value="${row.Deg || 0}" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" value="${row.Min || 0}" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" value="${row.Sec || 0}" class="w-20 p-1.5 border rounded-lg text-center"></td>
+                            <td class="p-2"><input type="number" step="0.001" value="${row.Jarak || 0}" class="w-28 p-1.5 border rounded-lg"></td>
+                            <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else if(type === 'waterpass') {
+                    const tbody = document.getElementById('tbody-waterpass');
+                    tbody.innerHTML = '';
+                    json.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-2"><input type="text" value="${row.Seksi || ''}" class="w-32 p-1.5 border rounded-lg text-center bg-slate-50 font-medium"></td>
+                            <td class="p-2"><input type="number" step="0.1" value="${row.Delta_H_Pergi || 0}" class="w-36 p-1.5 border rounded-lg"></td>
+                            <td class="p-2"><input type="number" step="0.1" value="${row.Delta_H_Pulang || 0}" class="w-36 p-1.5 border rounded-lg"></td>
+                            <td class="p-2"><input type="number" step="0.1" value="${row.Jarak || 0}" class="w-36 p-1.5 border rounded-lg"></td>
+                            <td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-trash"></i></button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                alert(`Berhasil memuat ${json.length} baris data instrumen ${type} dari file Excel!`);
             };
             reader.readAsArrayBuffer(file);
         }
