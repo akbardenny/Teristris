@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS Teristris - Pengolahan Data Otomatis</title>
+    <title>WebGIS Teristris - Control Quality Data Lapangan</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -55,7 +55,7 @@
                         </div>
                         <div>
                             <h1 class="text-white font-bold text-base leading-tight">Teristris GIS</h1>
-                            <span class="text-xs text-slate-400">Kalkulator Data Otomatis</span>
+                            <span class="text-xs text-slate-400">Control Quality Data</span>
                         </div>
                     </div>
                     <button id="sidebarClose" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
@@ -144,7 +144,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal alpha1 (°)</label>
-                            <input type="number" id="kkhAz0" value="201.703" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
+                            <input type="number" id="kkhAz0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">Ketelitian Alat (Detik / '')</label>
@@ -177,26 +177,26 @@
                                 <tbody id="tbody-input-kkh">
                                     <tr>
                                         <td><input type="text" value="P1" class="w-20 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="72.594" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="71.490" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P2" class="w-20 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="104.016" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="21.990" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P3" class="w-20 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="87.863" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="67.200" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P4" class="w-20 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="95.522" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="36.890" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -300,30 +300,30 @@
                                 <tbody id="tbody-input-wp">
                                     <tr>
                                         <td><input type="text" value="P1-P2" class="w-32 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="-0.706" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="0.058" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="71.490" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P2-P3" class="w-32 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="-0.117" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="0.782" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="21.991" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P3-P4" class="w-32 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="0.782" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="-0.117" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="67.196" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P4-P1" class="w-32 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="0.058" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="-0.706" class="w-32 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="36.893" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-32 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -370,7 +370,6 @@
                         </div>
                     </div>
 
-                    <!-- Input Tabel Detail Situasi -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                         <div class="flex justify-between items-center">
                             <h4 class="font-bold text-slate-700 text-sm"><i class="fas fa-keyboard mr-2 text-blue-600"></i>Tabel Input Data Lapangan Detail</h4>
@@ -394,26 +393,26 @@
                                 <tbody id="tbody-input-detail">
                                     <tr>
                                         <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
-                                        <td><input type="text" value="Taman 1" class="w-24 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.314" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.3" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.286" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" value="221" class="w-16 border rounded text-center"></td>
-                                        <td><input type="number" value="3" class="w-16 border rounded text-center"></td>
-                                        <td><input type="number" value="55" class="w-16 border rounded text-center"></td>
+                                        <td><input type="text" value="Detail 1" class="w-24 border rounded text-center bg-slate-50"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                     <tr>
                                         <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
-                                        <td><input type="text" value="Taman 2" class="w-24 border rounded text-center bg-slate-50"></td>
-                                        <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.325" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.3" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" step="0.001" value="1.275" class="w-20 border rounded text-center"></td>
-                                        <td><input type="number" value="101" class="w-16 border rounded text-center"></td>
-                                        <td><input type="number" value="3" class="w-16 border rounded text-center"></td>
-                                        <td><span class="text-rose-500 font-bold">450</span><input type="number" value="450" class="w-16 border rounded text-center hidden"></td> <!-- Sengaja diset salah detik (>60) untuk simulasi salah azimut -->
+                                        <td><input type="text" value="Detail 2" class="w-24 border rounded text-center bg-slate-50"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
+                                        <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
                                         <td><button onclick="this.closest('tr').remove()" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -429,7 +428,6 @@
                         </div>
                     </div>
 
-                    <!-- Hasil Tabel Perhitungan Detail & Audit Anomali -->
                     <div id="resultCardDetail" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                         <h4 class="font-bold text-slate-800 text-base"><i class="fas fa-table mr-2 text-emerald-600"></i>Hasil Matriks Perhitungan Detail & Deteksi Titik Bergeser</h4>
                         
@@ -454,9 +452,7 @@
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4">
-                            <div id="auditDetailReport" class="lg:col-span-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-sm">
-                                <!-- Laporan Audit Detail & Solusi -->
-                            </div>
+                            <div id="auditDetailReport" class="lg:col-span-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-sm"></div>
                             <div class="lg:col-span-6 bg-white p-2 rounded-xl border border-slate-200 flex flex-col h-[320px]">
                                 <h5 class="font-bold text-slate-700 text-xs mb-2">Visualisasi Peta Titik Detail & Indikator Pergeseran</h5>
                                 <div id="mapDetail" class="w-full flex-1 rounded-lg z-0"></div>
@@ -575,10 +571,10 @@
             tr.innerHTML = `
                 <td><input type="text" value="P1" class="w-16 border rounded text-center bg-slate-50 font-semibold"></td>
                 <td><input type="text" value="Detail ${r}" class="w-24 border rounded text-center bg-slate-50"></td>
-                <td><input type="number" step="0.001" value="1.450" class="w-20 border rounded text-center"></td>
-                <td><input type="number" step="0.001" value="1.300" class="w-20 border rounded text-center"></td>
-                <td><input type="number" step="0.001" value="1.250" class="w-20 border rounded text-center"></td>
-                <td><input type="number" step="0.001" value="1.200" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
+                <td><input type="number" step="0.001" value="0.000" class="w-20 border rounded text-center"></td>
                 <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
                 <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
                 <td><input type="number" value="0" class="w-16 border rounded text-center"></td>
@@ -764,7 +760,6 @@
             renderMapKKH(finalResults);
         }
 
-        // --- PROSES PERHITUNGAN DETAIL TACHEOMETRY & AUDIT ANOMALI (SALAH AZIMUT & GESER) ---
         function prosesDetailSheet() {
             const rows = document.querySelectorAll('#tbody-input-detail tr');
             if(rows.length === 0) { alert('Masukkan data titik detail terlebih dahulu.'); return; }
@@ -786,9 +781,6 @@
             });
 
             let calculatedDetails = [];
-            let totalJarak = 0;
-
-            // Hitung Jarak dan Azimuth sementara untuk cek rata-rata jarak (Deteksi Outlier / Geser)
             let tempDistances = rawDetails.map(d => {
                 let dist = (d.ba - d.bb) * 100;
                 return dist > 0 ? dist : 0;
@@ -802,18 +794,13 @@
                 let statusAnomali = "Normal";
                 let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
 
-                // Deteksi Error 1: Salah Azimut (Menit/Detik >= 60 atau Sudut negatif / >= 360)
                 if (d.min >= 60 || d.sec >= 60 || d.deg < 0 || decimalAngle >= 360) {
                     statusAnomali = "Salah Azimut (Format Menit/Detik > 60)";
                     badgeClass = "bg-rose-100 text-rose-800 border-rose-300";
-                } 
-                // Deteksi Error 2: Jarak negatif / nol (BA <= BB)
-                else if (jarak <= 0) {
+                } else if (jarak <= 0) {
                     statusAnomali = "Kesalahan Bacaan Rambu (BA <= BB)";
                     badgeClass = "bg-rose-100 text-rose-800 border-rose-300";
-                }
-                // Deteksi Error 3: Titik Bergeser / Mental (Outlier jarak terlalu jauh dari rata-rata atau > 200m untuk tacheometry optis)
-                else if (jarak > 200 || (jarak > avgDist * 3 && jarak > 80)) {
+                } else if (jarak > 200 || (jarak > avgDist * 3 && jarak > 80)) {
                     statusAnomali = "Titik Bergeser (Outlier Jarak Ekstrem)";
                     badgeClass = "bg-amber-100 text-amber-800 border-amber-300";
                 }
@@ -869,7 +856,7 @@
                 <p><b>Total Titik Detail:</b> ${calculatedDetails.length} titik</p>
                 <p><b>Titik Terdeteksi Bermasalah/Bergeser:</b> <span class="${totalAnomali > 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'}">${totalAnomali} titik</span></p>
                 <div class="mt-2 p-3 bg-white rounded-lg border text-xs space-y-1">
-                    <p class="font-semibold text-slate-700">Panduan Perbaikan Lapangan:</p>
+                    <p class="font-semibold text-slate-700">Panduan Perbaikan:</p>
                     <ul class="list-disc pl-4 space-y-1 text-slate-600">
                         <li><b>Salah Azimut:</b> Pastikan penulisan menit (') dan detik ('') berada dalam rentang 0 sampai 59. Jika lebih, lakukan konversi derajat dengan benar.</li>
                         <li><b>Titik Bergeser (Outlier):</b> Periksa kembali apakah pembacaan benang atas (BA) dan benang bawah (BB) tertukar atau salah catat di buku ukur, sehingga menyebabkan jarak horizontal terhitung terlalu besar.</li>
@@ -1099,9 +1086,9 @@
             let wb = XLSX.utils.book_new();
             let ws_data = [];
             if(type === 'kkh') {
-                ws_data = [["Titik", "Beta", "Jarak"], ["P1", 72.594, 71.490], ["P2", 104.016, 21.990]];
+                ws_data = [["Titik", "Beta", "Jarak"], ["P1", 0, 0], ["P2", 0, 0]];
             } else if(type === 'waterpass') {
-                ws_data = [["Seksi", "Pergi", "Pulang", "Jarak"], ["P1-P2", -0.706, 0.058, 71.490]];
+                ws_data = [["Seksi", "Pergi", "Pulang", "Jarak"], ["P1-P2", 0, 0, 0]];
             }
             let ws = XLSX.utils.aoa_to_sheet(ws_data);
             XLSX.utils.book_append_sheet(wb, ws, "Template");
