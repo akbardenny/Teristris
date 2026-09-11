@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGIS Teristris - Perhitungan Otomatis KKH dan KKV</title>
+    <title>WebGIS Teristris - Engineering Calculation Sheet</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -33,7 +33,6 @@
         #mainContent {
             transition: margin-left 0.3s ease-in-out;
         }
-        /* Tabel gaya engineering sheet */
         .eng-table th, .eng-table td {
             border: 1px solid #cbd5e1;
             padding: 6px 8px;
@@ -90,7 +89,7 @@
 
             <div class="px-2 text-xs text-slate-500 border-t border-slate-800 pt-4">
                 <p>Auto-Calculation Engine</p>
-                <p class="mt-1">© 2026 WebGIS Teristris by 123230055</p>
+                <p class="mt-1">© 2026 WebGIS Teristris</p>
             </div>
         </aside>
 
@@ -118,7 +117,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Lembar Kerja KKH & Perataan Bowditch Otomatis</h3>
-                            <p class="text-sm text-slate-500">Masukkan data Sudut Terukur ($\beta$) dan Jarak. Sistem akan menghitung seluruh matriks secara otomatis.</p>
+                            <p class="text-sm text-slate-500">Masukkan data Sudut Terukur (β) dan Jarak. Sistem akan menghitung seluruh matriks secara otomatis.</p>
                         </div>
                         <button onclick="downloadTemplate('kkh')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
@@ -137,7 +136,7 @@
                             <input type="number" id="kkhY0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal $\alpha_1$ (°)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Azimuth Awal α1 (°)</label>
                             <input type="number" id="kkhAz0" value="201.703" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                     </div>
@@ -156,7 +155,7 @@
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-700 font-semibold">
                                         <th>Titik</th>
-                                        <th>Sudut Terukur ($\beta$)</th>
+                                        <th>Sudut Terukur (β)</th>
                                         <th>Jarak (m)</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -208,19 +207,19 @@
                                 <thead>
                                     <tr class="bg-amber-100 text-slate-800 font-bold">
                                         <th>Titik</th>
-                                        <th>Sudut Terukur ($\beta$)</th>
+                                        <th>Sudut Terukur (β)</th>
                                         <th>Koreksi</th>
                                         <th>Sudut Terkoreksi</th>
-                                        <th>Jarak ($D$)</th>
-                                        <th>Azimuth ($\alpha$)</th>
-                                        <th>$D.\sin\alpha$</th>
-                                        <th>$D.\cos\alpha$</th>
-                                        <th>Koreksi $\Delta X$</th>
-                                        <th>Koreksi $\Delta Y$</th>
-                                        <th>$\Delta X$ Terkoreksi</th>
-                                        <th>$\Delta Y$ Terkoreksi</th>
-                                        <th>$X$ (Easting)</th>
-                                        <th>$Y$ (Northing)</th>
+                                        <th>Jarak (D)</th>
+                                        <th>Azimuth (α)</th>
+                                        <th>D.sin(α)</th>
+                                        <th>D.cos(α)</th>
+                                        <th>Koreksi ΔX</th>
+                                        <th>Koreksi ΔY</th>
+                                        <th>ΔX Terkoreksi</th>
+                                        <th>ΔY Terkoreksi</th>
+                                        <th>X (Easting)</th>
+                                        <th>Y (Northing)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-hasil-kkh"></tbody>
@@ -247,7 +246,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Lembar Kerja KKV Waterpass (Beda Tinggi Pergi-Pulang)</h3>
-                            <p class="text-sm text-slate-500">Masukkan $\Delta h$ pergi, $\Delta h$ pulang, dan jarak per seksi. Elevasi dan koreksi dihitung otomatis.</p>
+                            <p class="text-sm text-slate-500">Masukkan Δh pergi, Δh pulang, dan jarak per seksi. Elevasi dan koreksi dihitung otomatis.</p>
                         </div>
                         <button onclick="downloadTemplate('waterpass')" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-sm">
                             <i class="fas fa-file-excel"></i>
@@ -258,7 +257,7 @@
                     <!-- Parameter Elevasi Awal BM -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Elevasi Awal BM ($H_1$) (m)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Elevasi Awal BM (H1) (m)</label>
                             <input type="number" step="0.001" id="bmH0" value="0.000" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50">
                         </div>
                     </div>
@@ -277,9 +276,9 @@
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-700 font-semibold">
                                         <th>Titik / Seksi</th>
-                                        <th>$\Delta h$ Pergi (mm)</th>
-                                        <th>$\Delta h$ Pulang (mm)</th>
-                                        <th>Jarak ($D$) (m)</th>
+                                        <th>Δh Pergi (mm)</th>
+                                        <th>Δh Pulang (mm)</th>
+                                        <th>Jarak (D) (m)</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -333,12 +332,12 @@
                                 <thead>
                                     <tr class="bg-emerald-100 text-slate-800 font-bold">
                                         <th>Titik</th>
-                                        <th>$\Delta h$ Pergi (mm)</th>
-                                        <th>$\Delta h$ Pulang (mm)</th>
-                                        <th>$\Delta h$ Rata-rata (mm)</th>
-                                        <th>Jarak ($D$) (m)</th>
+                                        <th>Δh Pergi (mm)</th>
+                                        <th>Δh Pulang (mm)</th>
+                                        <th>Δh Rata-rata (mm)</th>
+                                        <th>Jarak (D) (m)</th>
                                         <th>Koreksi</th>
-                                        <th>Elevasi $H$ (m)</th>
+                                        <th>Elevasi H (m)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-hasil-wp"></tbody>
@@ -455,14 +454,11 @@
 
             let n = rawData.length;
             let sumBeta = rawData.reduce((acc, cur) => acc + cur.beta, 0);
-            let syaratBeta = (n - 2) * 180; // atau 360 tergantung poligon tertutup
-            // Asumsi poligon tertutup interior sudut: (n-2)*180 atau 360 tergantung kasus. Sesuai excel gambar: sumBeta = 359.995, syarat = 360
-            let fb = sumBeta - 360; // Kesalahan penutup sudut
+            let fb = sumBeta - 360; 
             let koreksiSudutPerTitik = -fb / n;
 
             let totalJarak = rawData.reduce((acc, cur) => acc + cur.jarak, 0);
 
-            // Hitung Azimuth, dX, dY mentah
             let currentAz = az0;
             let processed = rawData.map((d, i) => {
                 let betaTerkoreksi = d.beta + koreksiSudutPerTitik;
@@ -486,15 +482,13 @@
                 };
             });
 
-            let sumDX = processed.reduce((acc, cur) => acc + cur.dX_mentah, 0); // Fx
-            let sumDY = processed.reduce((acc, cur) => acc + cur.dY_mentah, 0); // Fy
+            let sumDX = processed.reduce((acc, cur) => acc + cur.dX_mentah, 0);
+            let sumDY = processed.reduce((acc, cur) => acc + cur.dY_mentah, 0);
 
-            // Bowditch correction & Koordinat akhir
             let currX = x0;
             let currY = y0;
             let finalResults = [];
 
-            // Titik awal
             finalResults.push({
                 titik: processed[processed.length-1].titik === 'P1' ? 'P1' : 'BM',
                 beta: '-', koreksi: '-', betaTerkoreksi: '-', jarak: '-', azimuth: '-', dSin: '-', dCos: '-',
@@ -528,7 +522,6 @@
                 });
             });
 
-            // Render ke Tabel Hasil KKH
             const tbody = document.getElementById('tbody-hasil-kkh');
             tbody.innerHTML = '';
             finalResults.forEach(row => {
@@ -552,21 +545,18 @@
                 `;
             });
 
-            // Ringkasan Error
             let linearMisclosure = Math.sqrt(sumDX*sumDX + sumDY*sumDY);
             document.getElementById('detailErrorKKH').innerHTML = `
-                <p><b>Jumlah Sudut ($\sum \beta$):</b> ${sumBeta.toFixed(3)}°</p>
-                <p><b>Kesalahan Sudut ($f\beta$):</b> ${fb.toFixed(4)}°</p>
+                <p><b>Jumlah Sudut (Σβ):</b> ${sumBeta.toFixed(3)}°</p>
+                <p><b>Kesalahan Sudut (fβ):</b> ${fb.toFixed(4)}°</p>
                 <p><b>Total Jarak:</b> ${totalJarak.toFixed(3)} m</p>
-                <p><b>Kesalahan Absis ($Fx$):</b> ${sumDX.toFixed(5)} m</p>
-                <p><b>Kesalahan Ordinat ($Fy$):</b> ${sumDY.toFixed(5)} m</p>
-                <p><b>Linear Misclosure ($fl$):</b> ${linearMisclosure.toFixed(5)} m</p>
+                <p><b>Kesalahan Absis (Fx):</b> ${sumDX.toFixed(5)} m</p>
+                <p><b>Kesalahan Ordinat (Fy):</b> ${sumDY.toFixed(5)} m</p>
+                <p><b>Linear Misclosure (fl):</b> ${linearMisclosure.toFixed(5)} m</p>
                 <p class="text-emerald-600 font-bold mt-1"><i class="fas fa-check-circle mr-1"></i> Perataan Bowditch Berhasil Diterapkan!</p>
             `;
 
             document.getElementById('resultCardKKH').classList.remove('hidden');
-
-            // Render Peta Leaflet
             renderMapKKH(finalResults);
         }
 
@@ -609,27 +599,23 @@
             let sumPulang = rawData.reduce((a, b) => a + b.pulang, 0);
             let totalJarak = rawData.reduce((a, b) => a + b.jarak, 0);
             
-            // Kesalahan penutup tinggi (Fh)
-            // Pergi + Pulang (dalam loop tertutup, jumlah Δh pergi + Δh pulang berlawanan tanda, atau total error Fh = sumPergi + sumPulang)
             let fh = sumPergi + sumPulang; 
-            let koreksiPerSeksi = -fh / rawData.length; // atau proporsional jarak
+            let koreksiPerSeksi = -fh / rawData.length;
 
             let currentH = h0;
             let finalWP = [];
 
-            // Titik awal
             finalWP.push({
                 titik: rawData[0].seksi.split('-')[0], pergi: '-', pulang: '-', rata: '-', jarak: '-', koreksi: '-', h: currentH
             });
 
             rawData.forEach(d => {
-                // Rata-rata Δh (pergi dan -pulang)
                 let rata = (d.pergi - d.pulang) / 2;
                 let kor = koreksiPerSeksi;
                 let rataTerkoreksi = rata + kor;
                 currentH += rataTerkoreksi;
 
-                let titikTujuan = d.seksi.includes('-') ? d.seksi.split('-')[1] : 'P_n';
+                let titikTujuan = d.seksi.includes('-') ? d.seksi.split('-')[1] : 'Pn';
 
                 finalWP.push({
                     titik: titikTujuan,
@@ -659,8 +645,8 @@
             });
 
             document.getElementById('detailErrorWP').innerHTML = `
-                <p><b>$\sum \Delta h$ Pergi:</b> ${sumPergi.toFixed(3)} mm | <b>$\sum \Delta h$ Pulang:</b> ${sumPulang.toFixed(3)} mm</p>
-                <p><b>Kesalahan Tinggi ($Fh$):</b> ${fh.toFixed(3)} mm | <b>Total Jarak:</b> ${totalJarak.toFixed(3)} m</p>
+                <p><b>Σ Δh Pergi:</b> ${sumPergi.toFixed(3)} mm | <b>Σ Δh Pulang:</b> ${sumPulang.toFixed(3)} mm</p>
+                <p><b>Kesalahan Tinggi (Fh):</b> ${fh.toFixed(3)} mm | <b>Total Jarak:</b> ${totalJarak.toFixed(3)} m</p>
                 <p class="text-emerald-600 font-bold mt-1"><i class="fas fa-check-circle mr-1"></i> Perhitungan KKV Waterpass Berhasil Diselesaikan!</p>
             `;
 
